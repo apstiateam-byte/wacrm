@@ -18,6 +18,7 @@ import { resumeAwaitingReply, runAutomationsForTrigger } from '@/lib/automations
 import { dispatchInboundToFlows } from '@/lib/flows/engine'
 import { dispatchInboundToAiReply } from '@/lib/ai/auto-reply'
 import { dispatchWebhookEvent } from '@/lib/webhooks/deliver'
+import { hasFeature, isAccountWritable } from '@/lib/billing/server'
 import {
   handleTemplateWebhookChange,
   isTemplateWebhookField,
@@ -857,6 +858,15 @@ async function processMessage(
   // trigger installed in migration 003).
   await flagBroadcastReplyIfAny(accountId, contactRecord.id)
 
+  // Plan gate for everything that SENDS on the account's behalf. The
+  // message above is always stored (a lapsed account must never lose
+  // customer messages); only the bots pause. Each check fails open.
+  const [accountWritable, flowsInPlan, aiInPlan] = await Promise.all([
+    isAccountWritable(accountId),
+    hasFeature(accountId, 'flows'),
+    hasFeature(accountId, 'ai'),
+  ])
+
   // ============================================================
   // Flow runner dispatch.
   //
@@ -876,7 +886,9 @@ async function processMessage(
   // no active flows take the runner's early-exit "no_match" path
   // basically for free (one indexed SELECT for the active run).
   // ============================================================
-  const flowResult = await dispatchInboundToFlows({
+  const flowResult = !(accountWritable && flowsInPlan)
+    ? { consumed: false }
+    : await dispatchInboundToFlows({
     accountId,
     userId: configOwnerUserId,
     contactId: contactRecord.id,
@@ -913,7 +925,7 @@ async function processMessage(
   // BEFORE the trigger dispatch so the message that parks a run can
   // never also resume it. Flows still win: only checked if no flow
   // consumed the message. Never throws.
-  const automationConsumed = flowConsumed
+  const automationConsumed = flowConsumed || !accountWritable
     ? false
     : await resumeAwaitingReply({
         accountId,
@@ -961,7 +973,7 @@ async function processMessage(
   // logging zero steps. `runAutomationsForTrigger` owns its own try/catch
   // and never throws; the `.catch` is belt-and-braces so one trigger
   // type's failure can't skip the rest of the loop.
-  for (const triggerType of automationTriggers) {
+  for (const triggerType of accountWritable ? automationTriggers : []) {
     await runAutomationsForTrigger({
       accountId,
       triggerType,
@@ -981,7 +993,13 @@ async function processMessage(
   // the account has enabled it. Awaited inside `after()` (same reason as
   // the webhook dispatch below); `dispatchInboundToAiReply` owns its
   // eligibility gates + try/catch and never throws.
-  if (!contentConsumed && !interactiveReplyId && inboundText.trim()) {
+  if (
+    accountWritable &&
+    aiInPlan &&
+    !contentConsumed &&
+    !interactiveReplyId &&
+    inboundText.trim()
+  ) {
     await dispatchInboundToAiReply({
       accountId,
       conversationId: conversation.id,

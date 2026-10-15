@@ -18,6 +18,7 @@
 // ============================================================
 
 import { NextResponse } from "next/server";
+import { assertNotDemo } from "@/lib/demo/server";
 
 import { requireRole, toErrorResponse } from "@/lib/auth/account";
 import {
@@ -170,6 +171,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const ctx = await requireRole("admin");
+    await assertNotDemo(ctx.accountId);
 
     // 30/min per user. The Members tab is a clicks-only UI so any
     // legitimate admin is far below this; the cap exists to keep

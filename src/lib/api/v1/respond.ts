@@ -16,6 +16,7 @@
 
 import { NextResponse } from 'next/server';
 import type { RateLimitResult } from '@/lib/rate-limit';
+import { PlanLimitError } from '@/lib/billing/server';
 
 export type ApiErrorCode =
   | 'unauthorized' // missing / malformed / unknown / revoked / expired key
@@ -119,6 +120,22 @@ export function fail(
  * never leak internal error text onto the public wire.
  */
 export function toApiErrorResponse(err: unknown): NextResponse {
+  // The account's plan blocks this (limit, feature, lapsed) → 402.
+  if (err instanceof PlanLimitError) {
+    return NextResponse.json(
+      {
+        error: {
+          code: 'payment_required',
+          message: err.message,
+          // Why: plan_limit_reached | feature_not_in_plan | account_read_only
+          reason: err.payload.code,
+          ...(err.payload.key ? { key: err.payload.key } : {}),
+          ...(err.payload.limit !== undefined ? { limit: err.payload.limit } : {}),
+        },
+      },
+      { status: 402 }
+    );
+  }
   if (err instanceof ApiError) {
     return NextResponse.json(
       { error: { code: err.code, message: err.message } },

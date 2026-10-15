@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  getPhoneNumberOwningWabaId,
   getSubscribedApps,
   registerPhoneNumber,
   subscribeWabaToApp,
@@ -178,5 +179,57 @@ describe('getSubscribedApps', () => {
     await expect(
       getSubscribedApps({ wabaId: 'WABA_1', accessToken: 'tok' }),
     ).rejects.toThrow(/Invalid OAuth token/);
+  });
+});
+
+describe('getPhoneNumberOwningWabaId', () => {
+  let fetchMock: ReturnType<typeof vi.fn>;
+  beforeEach(() => {
+    fetchMock = vi.fn();
+    vi.stubGlobal('fetch', fetchMock);
+  });
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('reads the WABA entity out of the number health_status', async () => {
+    fetchMock.mockResolvedValueOnce(
+      okResponse({
+        health_status: {
+          can_send_message: 'LIMITED',
+          entities: [
+            { entity_type: 'PHONE_NUMBER', id: 'PNID_1' },
+            { entity_type: 'WABA', id: 'WABA_OWNER' },
+            { entity_type: 'BUSINESS', id: 'BIZ_1' },
+            { entity_type: 'APP', id: 'APP_1' },
+          ],
+        },
+        id: 'PNID_1',
+      }),
+    );
+    const owner = await getPhoneNumberOwningWabaId({
+      phoneNumberId: 'PNID_1',
+      accessToken: 'tok',
+    });
+    expect(owner).toBe('WABA_OWNER');
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toContain('/PNID_1?fields=health_status');
+    expect(init.headers.Authorization).toBe('Bearer tok');
+  });
+
+  it('returns null when Meta omits health_status', async () => {
+    fetchMock.mockResolvedValueOnce(okResponse({ id: 'PNID_1' }));
+    await expect(
+      getPhoneNumberOwningWabaId({ phoneNumberId: 'PNID_1', accessToken: 'tok' }),
+    ).resolves.toBeNull();
+  });
+
+  it('throws on non-OK', async () => {
+    fetchMock.mockResolvedValueOnce(
+      errorResponse(400, { error: { message: 'Unsupported get request' } }),
+    );
+    await expect(
+      getPhoneNumberOwningWabaId({ phoneNumberId: 'PNID_1', accessToken: 'tok' }),
+    ).rejects.toThrow(/Unsupported get request/);
   });
 });

@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { AccountAccessAlert } from "@/components/layout/account-access-alert";
+import { BillingProvider } from "@/hooks/use-billing";
+import { BillingBanner } from "@/components/billing/billing-banner";
 import { PresenceHeartbeat } from "@/components/presence/presence-heartbeat";
 import { BrowserNotificationsListener } from "@/components/notifications/browser-notifications-listener";
 
@@ -59,6 +61,9 @@ function DashboardShellInner({ children }: { children: React.ReactNode }) {
           {/* Above every page: writes are being rejected and here's why.
               Renders nothing unless the account/role failed to resolve. */}
           <AccountAccessAlert />
+          {/* Trial ending / payment failed / read-only. Nothing while
+              billing is disabled or the plan is in good standing. */}
+          <BillingBanner />
           {children}
         </main>
       </div>
@@ -69,7 +74,9 @@ function DashboardShellInner({ children }: { children: React.ReactNode }) {
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   return (
     <AuthProvider>
-      <DashboardShellInner>{children}</DashboardShellInner>
+      <BillingProvider>
+        <DashboardShellInner>{children}</DashboardShellInner>
+      </BillingProvider>
     </AuthProvider>
   );
 }

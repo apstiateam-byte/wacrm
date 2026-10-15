@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { decrypt } from '@/lib/whatsapp/encryption'
 import {
+  getPhoneNumberOwningWabaId,
   getSubscribedApps,
   verifyPhoneNumber,
 } from '@/lib/whatsapp/meta-api'
+import { appSubscriptionState } from '@/lib/whatsapp/waba-pairing'
 import { getT } from '@/lib/i18n/translate'
 
 const t = getT('Api')
@@ -17,13 +19,15 @@ const t = getT('Api')
  * surfaced the multi-number bug originally: "UI says Connected but
  * Meta isn't delivering events."
  *
- * Three checks run independently so the UI can show which step
+ * Four checks run independently so the UI can show which step
  * passes and which fails:
  *
  *   1. phone_info  — GET /{phone_number_id} succeeds
- *   2. waba_subscription — our app appears in
- *                    GET /{waba_id}/subscribed_apps
- *   3. registered_at — local timestamp set by POST /config when
+ *   2. waba_id_matches_number — the saved WABA ID is the one Meta
+ *                    reports in the number's health_status
+ *   3. waba_subscription — our app appears in
+ *                    GET /{owning_waba_id}/subscribed_apps
+ *   4. registered_at — local timestamp set by POST /config when
  *                    /register last succeeded; NULL means the
  *                    number was saved but never actually subscribed
  *
@@ -91,12 +95,14 @@ export async function GET() {
     config_exists: boolean
     token_decryptable: boolean
     phone_metadata_ok: boolean
+    waba_id_matches_number: boolean | null
     waba_subscribed_to_app: boolean | null
     locally_marked_registered: boolean
   } = {
     config_exists: true,
     token_decryptable: true,
     phone_metadata_ok: false,
+    waba_id_matches_number: null,
     waba_subscribed_to_app: null,
     locally_marked_registered: config.registered_at != null,
   }
@@ -115,21 +121,50 @@ export async function GET() {
     )
   }
 
-  // 2. WABA subscription — only meaningful if we have a waba_id
-  if (config.waba_id) {
+  // 2. Which WABA does Meta route this number through? A saved WABA ID
+  //    can pass every other check (it may even list the number) while
+  //    Meta delivers the number's webhooks via a different WABA — one
+  //    that nobody subscribed. Best-effort: null when Meta won't say.
+  let owningWabaId: string | null = null
+  try {
+    owningWabaId = await getPhoneNumberOwningWabaId({
+      phoneNumberId: config.phone_number_id,
+      accessToken,
+    })
+  } catch (err) {
+    console.warn(
+      '[verify-registration] owning WABA lookup failed:',
+      err instanceof Error ? err.message : err,
+    )
+  }
+  if (owningWabaId && config.waba_id) {
+    checks.waba_id_matches_number = owningWabaId === config.waba_id
+    if (!checks.waba_id_matches_number) {
+      errors.push(
+        t('whatsappConfig.wabaNotOwner', { owner: owningWabaId, configured: config.waba_id }),
+      )
+    }
+  }
+
+  // 3. WABA subscription — checked on the WABA Meta actually routes
+  //    through, falling back to the saved one.
+  const wabaToCheck = owningWabaId ?? config.waba_id
+  if (wabaToCheck) {
     try {
       const subs = await getSubscribedApps({
-        wabaId: config.waba_id,
+        wabaId: wabaToCheck,
         accessToken,
       })
-      // Meta returns the apps subscribed to this WABA. If the list
-      // is non-empty, OUR app is in there (the access_token we used
-      // belongs to our app — Meta wouldn't return data for an app
-      // the token can't see). Treat any entry as success.
-      checks.waba_subscribed_to_app = subs.length > 0
-      if (!checks.waba_subscribed_to_app) {
+      // Meta lists EVERY app subscribed to the WABA, not just the one
+      // the token belongs to — so "non-empty" doesn't prove it's ours.
+      // With META_APP_ID set we can check for our app by id.
+      const state = appSubscriptionState(subs, process.env.META_APP_ID)
+      checks.waba_subscribed_to_app = state.appIdMatch ?? state.subscribed
+      if (!state.subscribed) {
+        errors.push(t('whatsappConfig.wabaNoApps'))
+      } else if (state.appIdMatch === false) {
         errors.push(
-          t('whatsappConfig.wabaNoApps'),
+          t('whatsappConfig.wabaWrongApp', { appId: process.env.META_APP_ID!.trim() }),
         )
       }
     } catch (err) {
@@ -137,7 +172,8 @@ export async function GET() {
         t('whatsappConfig.wabaCheckFailed', { message: err instanceof Error ? err.message : String(err) }),
       )
     }
-  } else {
+  }
+  if (!config.waba_id) {
     errors.push(
       t('whatsappConfig.noWabaId'),
     )
@@ -145,6 +181,7 @@ export async function GET() {
 
   const live =
     checks.phone_metadata_ok &&
+    checks.waba_id_matches_number !== false &&
     (checks.waba_subscribed_to_app ?? false) &&
     checks.locally_marked_registered
 
@@ -152,6 +189,7 @@ export async function GET() {
     live,
     checks,
     errors,
+    owning_waba_id: owningWabaId,
     last_registration_error: config.last_registration_error ?? null,
     registered_at: config.registered_at ?? null,
     subscribed_apps_at: config.subscribed_apps_at ?? null,

@@ -178,8 +178,17 @@ If the server cannot reach `graph.facebook.com` at all:
    `/register` never succeeded for this number; enter the two-step PIN
    and save.
 3. Click **Verify with Meta** for a per-check breakdown
-   (`phone_metadata_ok`, `waba_subscribed_to_app`,
-   `locally_marked_registered`).
+   (`phone_metadata_ok`, `waba_id_matches_number`,
+   `waba_subscribed_to_app`, `locally_marked_registered`).
+   `waba_id_matches_number: false` means Meta routes the number
+   through a different WABA than the one saved (the owner is read from
+   the number's `health_status`). `GET /{waba_id}/phone_numbers` can
+   still list the number under the saved id, and Meta's dashboard
+   **Test** button still reaches the webhook, but real messages go to
+   the owning WABA. Change the WABA ID to the one the error names and
+   save again. Saving now also subscribes the owning WABA automatically.
+   With `META_APP_ID` set, `waba_subscribed_to_app` checks that *this*
+   app is subscribed, not just any app.
 4. Confirm the webhook itself: in the Meta App → WhatsApp →
    Configuration, the callback URL must be `https://<your host>/api/whatsapp/webhook`,
    the verify token must match the one saved here, and the `messages`

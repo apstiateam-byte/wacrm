@@ -1,44 +1,26 @@
 import { ImageResponse } from "next/og";
 
-// Replaces the default Next.js favicon with the brand mark — Hostinger
-// violet rounded square + white chat-square glyph — matching the
-// sidebar logo in `src/components/layout/sidebar.tsx`. Next.js renders
-// this at build time and auto-injects <link rel="icon"> into <head>.
-//
-// This route takes precedence over src/app/favicon.ico, which is the
-// Next.js default and can stay on disk harmlessly (or be removed).
+import { LOGO_BARS, LOGO_BUBBLE_PATH } from "@/components/brand/logo";
 
-export const runtime = "edge";
+// Browser-tab icon: the "Growth" brand mark (chat bubble + rising bars)
+// on the Clay accent. Static hex because the favicon renders outside
+// the app's CSS; keep in sync with src/components/brand/logo.tsx.
+// Rendered at build time; Next injects <link rel="icon"> automatically.
+// This route takes precedence over src/app/favicon.ico.
+
 export const size = { width: 32, height: 32 };
 export const contentType = "image/png";
 
 export default function Icon() {
   return new ImageResponse(
     (
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          background: "#7c3aed", // primary (Hostinger-aligned purple)
-          borderRadius: 6,
-        }}
-      >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#ffffff"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-        </svg>
-      </div>
+      <svg width="32" height="32" viewBox="0 0 48 48">
+        <rect width="48" height="48" rx="11" fill="#b8603d" />
+        <path d={LOGO_BUBBLE_PATH} fill="none" stroke="#ffffff" strokeWidth="3" strokeLinejoin="round" />
+        {LOGO_BARS.map(([x, y, h]) => (
+          <rect key={x} x={x} y={y} width="3.6" height={h} rx="1.2" fill="#ffffff" />
+        ))}
+      </svg>
     ),
     { ...size },
   );

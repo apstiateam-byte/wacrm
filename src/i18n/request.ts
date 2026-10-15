@@ -1,4 +1,5 @@
 import { getRequestConfig } from 'next-intl/server';
+import { withBrand } from '@/lib/brand';
 
 export default getRequestConfig(async () => {
   // Read the locale from the environment, defaulting to 'en'
@@ -14,6 +15,7 @@ export default getRequestConfig(async () => {
 
   return {
     locale,
-    messages
+    // Product name from NEXT_PUBLIC_APP_NAME (see src/lib/brand.ts).
+    messages: withBrand(messages)
   };
 });

@@ -8,6 +8,7 @@
 // ============================================================
 
 import { requireApiKey } from '@/lib/auth/api-context';
+import { assertCountBelowLimit } from '@/lib/billing/server';
 import { ok, okList, fail, toApiErrorResponse } from '@/lib/api/v1/respond';
 import { encrypt } from '@/lib/whatsapp/encryption';
 import { normalizeEvents } from '@/lib/webhooks/events';
@@ -49,6 +50,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const ctx = await requireApiKey(request, 'webhooks:manage');
+    await assertCountBelowLimit(ctx.accountId, 'webhook_endpoints', 'webhook_endpoints', ctx.supabase);
 
     const body = (await request.json().catch(() => null)) as Record<
       string,

@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server'
 import { requireRole, toErrorResponse } from '@/lib/auth/account'
+import {
+  assertWritable,
+  releaseBroadcastRecipients,
+  reserveBroadcastRecipients,
+} from '@/lib/billing/server'
 import { sendTemplateMessage } from '@/lib/whatsapp/meta-api'
 import { decrypt } from '@/lib/whatsapp/encryption'
 import type { SendTimeParams } from '@/lib/whatsapp/template-send-builder'
@@ -163,6 +168,12 @@ export async function POST(request: Request) {
     }
     const templateRow = resolvedTemplate.row
 
+    // Monthly broadcast quota. Reserve the whole batch up front (402 if
+    // it doesn't fit, nothing sent); recipients that fail below are
+    // given back so only delivered attempts count.
+    await assertWritable(accountId)
+    await reserveBroadcastRecipients(accountId, recipients.length)
+
     const results: BroadcastResult[] = []
     let sentCount = 0
     let failedCount = 0
@@ -233,6 +244,8 @@ export async function POST(request: Request) {
         failedCount++
       }
     }
+
+    await releaseBroadcastRecipients(accountId, failedCount)
 
     return NextResponse.json({
       success: true,

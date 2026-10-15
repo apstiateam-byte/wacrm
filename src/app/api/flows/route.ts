@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { requireRole, toErrorResponse } from '@/lib/auth/account'
+import { assertCountBelowLimit, assertFeature } from '@/lib/billing/server'
 import { supabaseAdmin } from '@/lib/flows/admin-client'
 import { getFlowTemplate } from '@/lib/flows/templates'
 import { getT } from '@/lib/i18n/translate'
@@ -53,7 +54,10 @@ export async function POST(request: Request) {
   // `agent`, but this route inserts via the service-role client which
   // bypasses RLS, so the role must be enforced here.
   try {
-    await requireRole('agent')
+    const { accountId: planAccountId } = await requireRole('agent')
+    // Plan gate (service-role insert skips the DB limit trigger).
+    await assertFeature(planAccountId, 'flows')
+    await assertCountBelowLimit(planAccountId, 'flows', 'flows')
   } catch (err) {
     return toErrorResponse(err)
   }

@@ -133,6 +133,25 @@ BEGIN
       'idx_automation_pending_awaiting_reply is missing — migration 045 did not apply';
   END IF;
 
+  -- 047: SaaS billing. Plans are seeded with ON CONFLICT DO NOTHING, so
+  -- an empty catalogue would apply cleanly; billing must default to OFF
+  -- so self-hosted installs keep unlimited access.
+  IF NOT EXISTS (SELECT 1 FROM public.plans WHERE code = 'trial') THEN
+    RAISE EXCEPTION 'the trial plan was not seeded — migration 047 did not apply';
+  END IF;
+  IF (SELECT billing_enabled FROM public.platform_settings WHERE id) IS DISTINCT FROM FALSE THEN
+    RAISE EXCEPTION 'platform_settings.billing_enabled must default to false — migration 047';
+  END IF;
+  IF pg_get_functiondef('public.is_account_member(uuid,account_role_enum)'::regprocedure)
+       NOT LIKE '%account_is_writable%' THEN
+    RAISE EXCEPTION 'is_account_member does not check account_is_writable — migration 047 did not apply';
+  END IF;
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_trigger WHERE tgname = 'plan_limit_contacts' AND tgrelid = 'public.contacts'::regclass
+  ) THEN
+    RAISE EXCEPTION 'plan_limit_contacts trigger is missing — migration 047 did not apply';
+  END IF;
+
   RAISE NOTICE 'schema verification passed';
 END
 $$;

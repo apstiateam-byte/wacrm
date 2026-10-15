@@ -97,7 +97,7 @@ export default function ResetPasswordPage() {
         <Card className="w-full max-w-md border-border bg-card">
           <CardHeader className="items-center text-center">
             <div className="mb-2 flex h-12 w-12 items-center justify-center rounded-xl bg-amber-500/10">
-              <MailX className="h-6 w-6 text-amber-400" />
+              <MailX className="h-6 w-6 text-amber-600 dark:text-amber-400" />
             </div>
             <CardTitle className="text-xl text-foreground">
               {t("expiredTitle")}
@@ -176,7 +176,7 @@ export default function ResetPasswordPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             {error && (
-              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+              <div className="rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-600 dark:text-red-400">
                 {error}
               </div>
             )}

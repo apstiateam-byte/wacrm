@@ -127,3 +127,45 @@ your production origin.
   Supabase — see `NEXT_PUBLIC_SITE_URL` and `ALLOWED_INVITE_HOSTS` in
   `.env.local.example`.
 - Sign-in itself (`/login`) never involves an emailed link.
+
+## Branded email templates
+
+`supabase/templates/` holds branded HTML for all six Supabase Auth emails:
+confirm signup, reset password, magic link, invite user, change email
+address and reauthentication. They use the product's logo, the Clay
+colour and warm paper background, and the name from
+`NEXT_PUBLIC_APP_NAME`. The layout is table-based, so it renders in
+Gmail, Outlook and Apple Mail.
+
+**Regenerate** after changing the product name, support email or
+company name (read from the environment or `.env.local`):
+
+```bash
+npm run emails:build
+```
+
+**Install on hosted Supabase:** Dashboard → **Authentication → Emails →
+Templates**. For each template, copy the subject from
+`supabase/templates/SUBJECTS.md` and paste the whole HTML file into
+**Message body**.
+
+**Install on self-hosted / CLI stacks:** point each template at its file,
+e.g. in `supabase/config.toml`:
+
+```toml
+[auth.email.template.confirmation]
+subject = "Confirm your email"
+content_path = "./supabase/templates/confirmation.html"
+```
+
+**Notes**
+
+- The links use `{{ .ConfirmationURL }}`, so they keep honouring the
+  redirect rules above, and `/auth/callback` handles them unchanged.
+- The logo loads from `{{ .SiteURL }}/apple-icon` (a PNG; Gmail and
+  Outlook block SVG). Set the **Site URL** to your production domain, or
+  the logo can't load for recipients.
+- Supabase's built-in mailer is rate-limited and meant for testing. For
+  real customers, set up custom SMTP (Authentication → Emails → SMTP
+  Settings), for example with Resend, Postmark or Amazon SES, and a
+  sender address on your own domain.

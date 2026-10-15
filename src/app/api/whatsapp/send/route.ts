@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { requireRole, toErrorResponse } from '@/lib/auth/account'
+import { assertWritable } from '@/lib/billing/server'
 import {
   checkRateLimit,
   rateLimitResponse,
@@ -36,6 +37,8 @@ export async function POST(request: Request) {
     // failed to record it (surfacing as "sent to Meta but failed to save
     // to DB"). RLS can't un-send that, so the role check belongs here.
     const { supabase, accountId, userId } = await requireRole('agent')
+    // Sending writes nothing the RLS read-only gate would catch first.
+    await assertWritable(accountId)
 
     // Per-user rate limit. Bucket key is scoped to this route so
     // `/broadcast` has an independent budget.

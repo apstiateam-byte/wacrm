@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import {
+  getPhoneNumberOwningWabaId,
   getSubscribedApps,
   listWabaPhoneNumbers,
   registerPhoneNumber,
@@ -23,8 +24,10 @@ import {
 import { encrypt, decrypt } from '@/lib/whatsapp/encryption'
 import { resolveVerifyTokenForSave } from '@/lib/whatsapp/verify-token'
 import { getT } from '@/lib/i18n/translate'
+import { isDemoAccount } from '@/lib/demo/server'
 
 const t = getT('Api')
+const tDemo = getT('Api.demo')
 
 /**
  * Resolve the caller's account_id from their profile. Inlined here
@@ -268,6 +271,10 @@ export async function POST(request: Request) {
         { status: 403 },
       )
     }
+    // The shared live demo must keep its (empty) WhatsApp connection.
+    if (await isDemoAccount(accountId)) {
+      return NextResponse.json({ error: tDemo('blocked') }, { status: 403 })
+    }
 
     const body = await request.json()
     const { phone_number_id, waba_id, access_token, verify_token, pin } = body
@@ -500,6 +507,32 @@ export async function POST(request: Request) {
       }
     }
 
+    // The typed WABA can list this number and still not be the WABA
+    // Meta routes its webhooks through — the number's health_status
+    // names the real owner. Subscribe that one too, otherwise the save
+    // "succeeds", Meta's dashboard Test button works, and real inbound
+    // messages never arrive. Best-effort: the lookup is a diagnostic
+    // field the token may not be allowed to read.
+    try {
+      const owningWabaId = await getPhoneNumberOwningWabaId({
+        phoneNumberId: phone_number_id,
+        accessToken: access_token,
+      })
+      if (owningWabaId && owningWabaId !== waba_id) {
+        console.warn(
+          `[whatsapp/config POST] phone ${phone_number_id} is owned by WABA ${owningWabaId}, ` +
+            `not the saved ${waba_id || '(none)'} — subscribing the owning WABA as well`,
+        )
+        await subscribeWabaToApp({ wabaId: owningWabaId, accessToken: access_token })
+        subscribedAppsAt = new Date().toISOString()
+      }
+    } catch (err) {
+      console.warn(
+        '[whatsapp/config POST] owning-WABA subscription skipped:',
+        err instanceof Error ? err.message : err,
+      )
+    }
+
     // Persist everything in one shot. If /register failed we still
     // store the credentials and the error so the UI can guide the
     // user through a retry.
@@ -609,6 +642,10 @@ export async function DELETE() {
         { error: t('common.profileNotLinked') },
         { status: 403 },
       )
+    }
+    // The shared live demo must keep its (empty) WhatsApp connection.
+    if (await isDemoAccount(accountId)) {
+      return NextResponse.json({ error: tDemo('blocked') }, { status: 403 })
     }
 
     const { error: deleteError } = await supabase

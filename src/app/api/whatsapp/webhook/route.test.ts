@@ -267,6 +267,12 @@ vi.mock('@/lib/whatsapp/template-webhook', () => ({
     field.startsWith('message_template_'),
   handleTemplateWebhookChange: vi.fn(),
 }))
+// Plan gates: an account in good standing, so the bots run. Mocked so
+// the billing RPCs don't show up in `rpcCalls` below.
+vi.mock('@/lib/billing/server', () => ({
+  isAccountWritable: async () => true,
+  hasFeature: async () => true,
+}))
 vi.mock('@/lib/automations/engine', () => ({
   runAutomationsForTrigger: h.runAutomationsForTrigger,
   resumeAwaitingReply: h.resumeAwaitingReply,

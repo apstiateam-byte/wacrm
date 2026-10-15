@@ -100,13 +100,13 @@ export const NODE_META: Record<
   start: {
     slugSeed: 'Start',
     icon: PlayCircle,
-    color: 'text-emerald-400',
+    color: 'text-emerald-600 dark:text-emerald-400',
     category: 'flow',
   },
   send_message: {
     slugSeed: 'Send message',
     icon: MessageCircle,
-    color: 'text-sky-400',
+    color: 'text-sky-600 dark:text-sky-400',
     category: 'messaging',
   },
   send_buttons: {
@@ -148,7 +148,7 @@ export const NODE_META: Record<
   handoff: {
     slugSeed: 'Handoff to agent',
     icon: UserPlus,
-    color: 'text-amber-400',
+    color: 'text-amber-600 dark:text-amber-400',
     category: 'flow',
   },
   end: {

@@ -19,6 +19,7 @@
 // ============================================================
 
 import { NextResponse } from "next/server";
+import { assertNotDemo } from "@/lib/demo/server";
 import type { PostgrestError } from "@supabase/supabase-js";
 
 import { requireRole, toErrorResponse } from "@/lib/auth/account";
@@ -61,6 +62,7 @@ export async function POST(request: Request) {
     // this too, but failing fast here saves a Supabase round trip
     // on the obvious "admin trying to transfer" case.
     const ctx = await requireRole("owner");
+    await assertNotDemo(ctx.accountId);
 
     // Rate-limit owner-only transfers. Legitimate use is one click
     // every few months at most; a script run in a loop would

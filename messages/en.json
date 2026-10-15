@@ -41,7 +41,15 @@
     "defaultAvatar": "Avatar",
     "menuProfile": "Profile",
     "menuSettings": "Settings",
-    "menuSignOut": "Sign out"
+    "menuSignOut": "Sign out",
+    "platformAdmin": "Platform admin",
+    "groups": {
+      "engage": "Engage",
+      "grow": "Grow",
+      "sell": "Sell"
+    },
+    "collapseSidebar": "Collapse sidebar",
+    "expandSidebar": "Expand sidebar"
   },
   "Header": {
     "dashboard": "Dashboard",
@@ -58,7 +66,10 @@
     "defaultAvatar": "Avatar",
     "menuProfile": "Profile",
     "menuSettings": "Settings",
-    "menuSignOut": "Sign out"
+    "menuSignOut": "Sign out",
+    "flows": "Flows",
+    "agents": "AI Agents",
+    "admin": "Platform admin"
   },
   "ModeToggle": {
     "switchMode": "Switch to {mode} mode"
@@ -154,6 +165,33 @@
     },
     "emptyState": {
       "title": "Not enough data yet"
+    },
+    "onboarding": {
+      "title": "Get started",
+      "progress": "{done} of {total} steps done",
+      "dismiss": "Hide checklist",
+      "steps": {
+        "whatsapp": {
+          "title": "Connect WhatsApp",
+          "body": "Link your WhatsApp Business number"
+        },
+        "template": {
+          "title": "Add a template",
+          "body": "Create or sync an approved message template"
+        },
+        "contacts": {
+          "title": "Import contacts",
+          "body": "Upload a CSV or add your first contact"
+        },
+        "team": {
+          "title": "Invite your team",
+          "body": "Bring in agents to share the inbox"
+        },
+        "broadcast": {
+          "title": "Send a broadcast",
+          "body": "Reach opted-in customers in one go"
+        }
+      }
     }
   },
   "Inbox": {
@@ -1784,7 +1822,8 @@
       "fields": "Fields & tags",
       "deals": "Deals & currency",
       "members": "Team members",
-      "api": "API keys"
+      "api": "API keys",
+      "billing": "Billing & plan"
     },
     "groups": {
       "account": "Account",
@@ -2671,6 +2710,8 @@
       "phoneCheckFailed": "Phone metadata check failed: {message}",
       "wabaNoApps": "WABA has no subscribed apps. Re-save the configuration to subscribe.",
       "wabaCheckFailed": "WABA subscription check failed: {message}",
+      "wabaNotOwner": "Meta routes this number through WhatsApp Business Account {owner}, not the saved {configured} — so inbound messages go to a WABA wacrm never subscribed. Change the WABA ID to {owner} and save again.",
+      "wabaWrongApp": "The WABA is subscribed to other apps, but not to this app (META_APP_ID {appId}). Generate the access token for this app and save again.",
       "noWabaId": "No WABA ID on file — webhooks can't be wired without it. Add it in the form and re-save."
     },
     "media": {
@@ -2715,6 +2756,358 @@
       "submitFailed": "Failed to submit template.",
       "metaApiStatus": "Meta API error: {status}",
       "syncFailed": "Failed to sync templates"
+    },
+    "billing": {
+      "readOnly": "This workspace is read-only because its trial or subscription has ended. Choose a plan in Settings → Billing & plan to continue.",
+      "featureNotInPlan": "{feature} is not included in your current plan. Upgrade in Settings → Billing & plan.",
+      "features": {
+        "flows": "Chatbot flows",
+        "ai": "AI replies and agents",
+        "api": "Public API and webhooks"
+      },
+      "limitReached": "Your plan allows {limit} {what}. Upgrade or buy an add-on to add more.",
+      "limits": {
+        "seats": "team seats",
+        "contacts": "contacts",
+        "broadcast_recipients_monthly": "broadcast recipients per month",
+        "pipelines": "pipelines",
+        "automations": "automations",
+        "flows": "chatbot flows",
+        "api_keys": "API keys",
+        "webhook_endpoints": "webhook endpoints"
+      },
+      "broadcastQuota": "This send would exceed your monthly broadcast allowance ({remaining} of {limit} recipients left). Upgrade your plan to send more.",
+      "invalidGstin": "That GSTIN doesn't look right. It should be 15 characters, e.g. 22AAAAA0000A1Z5.",
+      "invalidEmail": "Enter a valid billing email address.",
+      "saveFailed": "Could not save billing details.",
+      "checkoutUnavailable": "Online payments are not configured on this server yet.",
+      "invalidPlan": "That plan can't be purchased online.",
+      "billingDisabled": "Billing is turned off on this installation.",
+      "providerError": "The payment provider returned an error: {message}",
+      "invalidPayment": "Missing payment details.",
+      "paymentNotPending": "This payment doesn't match a checkout started for your workspace.",
+      "invalidSignature": "Payment verification failed. If you were charged, it will be applied automatically within a few minutes.",
+      "nothingToCancel": "There is no active subscription to cancel.",
+      "invalidAddon": "Choose a valid add-on and a quantity between 1 and 100.",
+      "addonNeedsPlan": "Add-ons are available on paid plans. Choose a plan first.",
+      "addonManaged": "This add-on was granted by your account manager — contact them to change it."
+    },
+    "demo": {
+      "blocked": "This action is turned off in the live demo. Start a free trial to use it with your own WhatsApp number.",
+      "disabled": "The live demo is not available on this installation.",
+      "startFailed": "Could not open the live demo. Please try again."
+    }
+  },
+  "Billing": {
+    "upgrade": {
+      "title": "Upgrade to keep going",
+      "readOnlyTitle": "Your workspace is read-only",
+      "genericBody": "This action isn't available on your current plan.",
+      "readOnlyBody": "Your trial or subscription has ended, so the workspace is read-only. Incoming messages are still saved. Choose a plan to start sending again.",
+      "featureBody": "{feature} isn't included in your current plan.",
+      "limitBody": "You've reached your plan's limit of {limit} {what}.",
+      "limitBodyNoNumber": "You've reached your plan's limit for {what}.",
+      "currentPlan": "Current plan: {plan}",
+      "notNow": "Not now",
+      "seePlans": "See plans"
+    },
+    "limits": {
+      "seats": "Team seats",
+      "contacts": "Contacts",
+      "broadcast_recipients_monthly": "Broadcast recipients / month",
+      "pipelines": "Pipelines",
+      "automations": "Automations",
+      "flows": "Chatbot flows",
+      "api_keys": "API keys",
+      "webhook_endpoints": "Webhook endpoints"
+    },
+    "features": {
+      "flows": "Chatbot flows",
+      "ai": "AI replies & agents",
+      "api": "Public API & webhooks"
+    },
+    "banner": {
+      "trialTitle": "Your free trial ends in {days, plural, =0 {less than a day} one {# day} other {# days}}",
+      "trialBody": "Choose a plan to keep your inbox, broadcasts and automations running without interruption.",
+      "choosePlan": "Choose a plan",
+      "pastDueTitle": "Payment failed",
+      "pastDueBody": "We couldn't charge your last renewal. Update your payment method to avoid the workspace becoming read-only.",
+      "fixPayment": "Fix payment",
+      "canceledTitle": "Your subscription ends in {days, plural, =0 {less than a day} one {# day} other {# days}}",
+      "canceledBody": "It won't renew. Resubscribe any time to keep full access.",
+      "resubscribe": "Resubscribe",
+      "renewTitle": "Your annual plan ends in {days, plural, =0 {less than a day} one {# day} other {# days}}",
+      "renewBody": "Annual plans don't renew automatically. Renew now to avoid interruption — the new year starts when the current one ends.",
+      "renew": "Renew",
+      "trialExpiredTitle": "Your free trial has ended",
+      "expiredTitle": "Your subscription has ended",
+      "suspendedTitle": "This workspace is suspended",
+      "suspendedBody": "Contact support to restore access. Your data is safe.",
+      "readOnlyBody": "The workspace is read-only. Incoming WhatsApp messages are still saved; sending, broadcasts and automations are paused until you choose a plan."
+    },
+    "meters": {
+      "usedUnlimited": "{used} · Unlimited",
+      "usedOf": "{used} of {limit}"
+    },
+    "plans": {
+      "intervalLabel": "Billing period",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "savePercent": "Save {percent}%",
+      "mostPopular": "Most popular",
+      "custom": "Custom",
+      "perMonth": "/month",
+      "billedYearly": "Billed {amount} yearly",
+      "billedMonthly": "Billed monthly",
+      "plusGst": "+{percent}% GST",
+      "unlimitedOf": "Unlimited {what}",
+      "countOf": "{count} {what}",
+      "contactSales": "Contact sales",
+      "currentPlan": "Current plan",
+      "switchInterval": "Switch billing period",
+      "choose": "Choose {plan}",
+      "annualNote": "Annual plans are a single payment for 12 months and don't auto-renew. Meta's WhatsApp message charges are billed by Meta separately."
+    },
+    "states": {
+      "unlimited": "Unlimited",
+      "trialing": "Trial",
+      "active": "Active",
+      "past_due": "Payment due",
+      "canceled": "Cancelled",
+      "trial_expired": "Trial ended",
+      "expired": "Expired",
+      "suspended": "Suspended"
+    },
+    "panel": {
+      "loading": "Loading billing…",
+      "title": "Billing & plan",
+      "description": "Your plan, usage and invoices.",
+      "disabledTitle": "Billing is off",
+      "disabledBody": "This installation runs without plans or limits — every feature is unlimited.",
+      "openAdmin": "Open platform admin",
+      "trialEnds": "Free trial ends {date} ({days, plural, =0 {today} one {# day left} other {# days left}}).",
+      "trialEnded": "Free trial ended {date}.",
+      "endsOn": "Access ends {date}.",
+      "renewsOn": "Renews {date}.",
+      "pastDue": "The last renewal payment failed. Razorpay will retry; update your payment method if it keeps failing.",
+      "suspended": "Suspended by the platform operator.",
+      "expiredOn": "Ended {date}.",
+      "checkoutFailed": "Could not start checkout.",
+      "checkoutDescription": "{plan} plan · {interval}",
+      "intervalMonthly": "Monthly",
+      "intervalAnnual": "Annual",
+      "paymentProcessing": "Payment received — your plan will update in a minute.",
+      "paymentSuccess": "You're on the {plan} plan. Thank you!",
+      "cancelConfirm": "Cancel auto-renewal? You keep full access until the end of the current period.",
+      "cancelFailed": "Could not cancel the subscription.",
+      "cancelDone": "Auto-renewal cancelled. Access continues until {date}.",
+      "cancel": "Cancel subscription",
+      "plansTitle": "Plans",
+      "checkoutNotConfigured": "Online payment isn't configured on this server yet. Contact the platform operator to change plans.",
+      "plansDescription": "Upgrade or switch any time. Prices exclude GST; WhatsApp message charges are billed by Meta.",
+      "plansAdminOnly": "Only workspace owners and admins can change the plan.",
+      "detailsTitle": "Invoice details",
+      "detailsDescription": "Shown on your GST invoices.",
+      "historyTitle": "Payment history",
+      "historyEmpty": "No payments yet.",
+      "invoiceNote": "Razorpay emails a receipt for every payment to the billing email.",
+      "addonsTitle": "Add-ons",
+      "addonsDescription": "Raise a single limit without changing plan. Billed monthly per unit, plus GST.",
+      "addonsNeedPlan": "Add-ons are available on paid plans. Choose a plan first.",
+      "checkoutAdminHint": "Buy buttons are disabled because Razorpay isn’t connected yet. Add your Razorpay keys in the platform admin to start taking payments.",
+      "checkoutAdminLink": "Set up payments"
+    },
+    "details": {
+      "name": "Business name",
+      "email": "Billing email",
+      "gstin": "GSTIN (optional)",
+      "gstinHint": "Add it to claim input tax credit.",
+      "state": "State",
+      "address": "Billing address",
+      "save": "Save details",
+      "saved": "Billing details saved.",
+      "saveFailed": "Could not save billing details."
+    },
+    "sidebar": {
+      "daysLeft": "{days, plural, =0 {Ends today} one {# day left} other {# days left}}",
+      "readOnly": "Read-only",
+      "upgrade": "Upgrade plan →"
+    },
+    "demo": {
+      "title": "You are exploring the live demo",
+      "body": "This is a shared sample workspace. Data resets every night and messages are not sent to real WhatsApp numbers.",
+      "cta": "Start your free trial"
+    },
+    "addons": {
+      "perUnit": "per unit / month",
+      "active": "{quantity} active",
+      "ending": "Ends this month",
+      "managed": "Included by your account manager.",
+      "decrease": "Decrease quantity",
+      "increase": "Increase quantity",
+      "buy": "Buy",
+      "update": "Update",
+      "stop": "Stop",
+      "stopConfirm": "Stop renewing this add-on? It stays active until the end of the current month.",
+      "stopped": "The add-on will stop at the end of the month.",
+      "added": "{addon} added.",
+      "processing": "Payment received — the add-on will appear in a minute.",
+      "failed": "Could not update the add-on.",
+      "checkoutDescription": "{addon} × {quantity} (monthly)"
+    }
+  },
+  "Admin": {
+    "forbidden": "You don't have access to the platform admin console.",
+    "loading": "Loading…",
+    "loadFailed": "Could not load the admin console.",
+    "title": "Platform admin",
+    "description": "Billing switches, plans and every workspace on this installation.",
+    "metrics": {
+      "workspaces": "Workspaces",
+      "trialing": "On trial",
+      "paying": "Paying",
+      "pastDue": "Payment due",
+      "lapsed": "Lapsed",
+      "mrr": "MRR (excl. GST)"
+    },
+    "settings": {
+      "title": "Billing settings",
+      "description": "Platform-wide switches. Turning billing on starts enforcing plans and limits for every workspace.",
+      "enableConfirm": "Turn billing on? Every workspace will be held to its plan's limits, and lapsed trials become read-only.",
+      "saveFailed": "Could not save settings.",
+      "saved": "Settings saved.",
+      "trial_days": "Trial length (days)",
+      "grace_days": "Grace period after a failed or ended payment (days)",
+      "gst_percent": "GST %",
+      "billingEnabled": "Billing enabled",
+      "billingEnabledHint": "Off = self-hosted mode: no plans, no limits, nothing to pay.",
+      "razorpayKeys": "Razorpay API keys",
+      "razorpayWebhook": "Razorpay webhook secret",
+      "save": "Save settings",
+      "configurePayments": "Set up payments →"
+    },
+    "plans": {
+      "title": "Plans",
+      "description": "Prices in rupees, excluding GST. Leave a limit empty for unlimited.",
+      "save": "Save plans",
+      "saveFailed": "Could not save plans.",
+      "saved": "Plans saved.",
+      "name": "Plan name",
+      "public": "Public",
+      "highlighted": "Most popular",
+      "monthly": "Monthly price (₹)",
+      "annual": "Annual price (₹, full year)",
+      "unlimited": "Unlimited",
+      "preview": "Shows as {monthly}/month",
+      "priceChangeNote": "Changing a monthly price creates a new Razorpay plan on the next checkout. Existing subscribers keep their current price."
+    },
+    "accounts": {
+      "title": "Workspaces",
+      "description": "{count, plural, one {# workspace} other {# workspaces}}",
+      "search": "Search by name or owner email",
+      "workspace": "Workspace",
+      "plan": "Plan",
+      "status": "Status",
+      "renewsOrEnds": "Renews / ends",
+      "usage": "Usage",
+      "empty": "No workspaces found.",
+      "since": "since {date}",
+      "usageLine": "{seats} seats · {contacts} contacts",
+      "manage": "Manage",
+      "prev": "Previous",
+      "next": "Next",
+      "pageOf": "Page {page} of {pages}",
+      "demo": "Live demo"
+    },
+    "manage": {
+      "plan": "Plan",
+      "status": "Status",
+      "interval": "Billing period",
+      "monthly": "Monthly",
+      "annual": "Annual",
+      "trialEnds": "Trial ends",
+      "extend": "+{days} days",
+      "periodEnds": "Paid until",
+      "periodHint": "For manual / invoice deals: set status Active and a paid-until date.",
+      "addons": "Add-ons",
+      "overrides": "Limit overrides",
+      "overridesHint": "Replace a plan limit for this workspace only. A number, \"unlimited\", or empty for the plan default.",
+      "planDefault": "Plan default",
+      "suspend": "Suspend workspace",
+      "suspendHint": "Read-only for everyone; incoming messages are still saved.",
+      "cancel": "Cancel",
+      "save": "Save changes",
+      "saved": "Workspace updated.",
+      "saveFailed": "Could not update the workspace."
+    },
+    "statuses": {
+      "trialing": "Trial",
+      "active": "Active",
+      "past_due": "Payment due",
+      "canceled": "Cancelled",
+      "expired": "Expired"
+    },
+    "payments": {
+      "title": "Payments (Razorpay)",
+      "description": "Connect Razorpay so customers can buy plans and add-ons. Secrets are stored encrypted and never shown again after saving.",
+      "modeLive": "Live mode",
+      "modeTest": "Test mode",
+      "apiKeys": "API keys",
+      "webhookSecret": "Webhook secret",
+      "fromEnv": "from environment",
+      "fromAdmin": "saved here",
+      "envLocked": "Keys are set as environment variables on the server, which take precedence. Remove them there to manage keys here.",
+      "keyId": "Key ID",
+      "keySecret": "Key secret",
+      "savedKeep": "Saved — leave blank to keep",
+      "webhookSecretHint": "The secret you set on the Razorpay webhook",
+      "webhookSetupTitle": "Razorpay webhook",
+      "webhookSetupBody": "In Razorpay Dashboard → Webhooks, add this URL, set a secret (paste the same one above) and tick these events:",
+      "copy": "Copy",
+      "copied": "Webhook URL copied",
+      "events": "Events to enable",
+      "save": "Save payment settings",
+      "saved": "Payment settings saved.",
+      "saveFailed": "Could not save payment settings.",
+      "test": "Test connection",
+      "testOk": "Razorpay accepted the keys.",
+      "testFailed": "Razorpay rejected the keys: {error}",
+      "clear": "Remove saved keys",
+      "clearConfirm": "Remove the Razorpay keys saved here? Checkout stops working until new keys are added.",
+      "cleared": "Saved keys removed."
+    }
+  },
+  "Emails": {
+    "billing": {
+      "footer": "You are receiving this because you manage billing for a {brand} workspace.",
+      "trialEnding": {
+        "subject": "Your {brand} trial ends in {days, plural, one {# day} other {# days}}",
+        "heading": "Your free trial ends in {days, plural, one {# day} other {# days}}",
+        "body": "The free trial for {workspace} ends on {date}. Choose a plan now to keep your inbox, broadcasts and automations running without interruption.",
+        "body2": "If you do nothing, the workspace becomes read-only — nothing is deleted and incoming WhatsApp messages keep arriving.",
+        "cta": "Choose a plan"
+      },
+      "trialEnded": {
+        "subject": "Your {brand} trial has ended",
+        "heading": "Your free trial has ended",
+        "body": "The free trial for {workspace} ended on {date}, so the workspace is now read-only.",
+        "body2": "Your data is safe and incoming messages are still saved. Choose a plan to start sending again.",
+        "cta": "Choose a plan"
+      },
+      "paymentFailed": {
+        "subject": "Payment failed for your {brand} subscription",
+        "heading": "We couldn’t process your payment",
+        "body": "The latest renewal payment for {workspace} failed. Razorpay will retry automatically.",
+        "body2": "Please update your payment method before {date} to avoid the workspace becoming read-only.",
+        "cta": "Update payment"
+      },
+      "renewal": {
+        "subject": "Your {brand} annual plan ends in {days, plural, one {# day} other {# days}}",
+        "heading": "Time to renew your annual plan",
+        "body": "The annual plan for {workspace} ends on {date}. Annual plans don’t renew automatically.",
+        "body2": "Renew now — the new year starts when the current one ends, so you lose no days.",
+        "cta": "Renew plan"
+      }
     }
   }
 }

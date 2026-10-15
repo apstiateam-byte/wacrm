@@ -1,5 +1,6 @@
 import { createTranslator } from 'next-intl';
 import activeMessages from '@app-messages';
+import { withBrand } from '@/lib/brand';
 
 /**
  * Translator for code that runs outside React — API route handlers,
@@ -17,7 +18,7 @@ type Catalogue = Record<string, unknown>;
 function loadCatalogue(): { locale: string; messages: Catalogue } {
   const env = process.env.NEXT_PUBLIC_APP_LOCALE ?? '';
   const locale = ['en', 'pt', 'es', 'ko'].includes(env) ? env : 'en';
-  return { locale, messages: activeMessages as Catalogue };
+  return { locale, messages: withBrand(activeMessages as Catalogue) };
 }
 
 let cached: { locale: string; messages: Catalogue } | null = null;

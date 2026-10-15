@@ -15,6 +15,7 @@
 // ============================================================
 
 import { NextResponse } from "next/server";
+import { assertNotDemo } from "@/lib/demo/server";
 import type { PostgrestError } from "@supabase/supabase-js";
 
 import { requireRole, toErrorResponse } from "@/lib/auth/account";
@@ -51,6 +52,7 @@ export async function PATCH(
 ) {
   try {
     const ctx = await requireRole("admin");
+    await assertNotDemo(ctx.accountId);
 
     const limit = checkRateLimit(
       `admin:memberRole:${ctx.userId}`,
@@ -103,6 +105,7 @@ export async function DELETE(
 ) {
   try {
     const ctx = await requireRole("admin");
+    await assertNotDemo(ctx.accountId);
 
     const limit = checkRateLimit(
       `admin:memberRemove:${ctx.userId}`,

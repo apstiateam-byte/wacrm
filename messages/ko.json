@@ -41,7 +41,15 @@
     "defaultAvatar": "아바타",
     "menuProfile": "프로필",
     "menuSettings": "설정",
-    "menuSignOut": "로그아웃"
+    "menuSignOut": "로그아웃",
+    "platformAdmin": "플랫폼 관리자",
+    "groups": {
+      "engage": "소통",
+      "grow": "성장",
+      "sell": "판매"
+    },
+    "collapseSidebar": "사이드바 접기",
+    "expandSidebar": "사이드바 펼치기"
   },
   "Header": {
     "dashboard": "대시보드",
@@ -58,7 +66,10 @@
     "defaultAvatar": "아바타",
     "menuProfile": "프로필",
     "menuSettings": "설정",
-    "menuSignOut": "로그아웃"
+    "menuSignOut": "로그아웃",
+    "flows": "플로우",
+    "agents": "AI 에이전트",
+    "admin": "플랫폼 관리자"
   },
   "ModeToggle": {
     "switchMode": "{mode} 모드로 전환"
@@ -154,6 +165,33 @@
     },
     "emptyState": {
       "title": "아직 데이터가 충분하지 않습니다"
+    },
+    "onboarding": {
+      "title": "시작하기",
+      "progress": "{total}단계 중 {done}단계 완료",
+      "dismiss": "체크리스트 숨기기",
+      "steps": {
+        "whatsapp": {
+          "title": "WhatsApp 연결",
+          "body": "WhatsApp Business 번호를 연결하세요"
+        },
+        "template": {
+          "title": "템플릿 추가",
+          "body": "승인된 메시지 템플릿을 만들거나 동기화하세요"
+        },
+        "contacts": {
+          "title": "연락처 가져오기",
+          "body": "CSV를 업로드하거나 첫 연락처를 추가하세요"
+        },
+        "team": {
+          "title": "팀 초대",
+          "body": "상담원을 초대해 받은편지함을 함께 사용하세요"
+        },
+        "broadcast": {
+          "title": "브로드캐스트 보내기",
+          "body": "수신에 동의한 고객에게 한 번에 메시지를 보내세요"
+        }
+      }
     }
   },
   "Inbox": {
@@ -1784,7 +1822,8 @@
       "fields": "필드 & 태그",
       "deals": "딜 & 통화",
       "members": "팀원",
-      "api": "API 키"
+      "api": "API 키",
+      "billing": "결제 및 요금제"
     },
     "groups": {
       "account": "계정",
@@ -2671,6 +2710,8 @@
       "phoneCheckFailed": "전화번호 메타데이터 확인 실패: {message}",
       "wabaNoApps": "WABA에 구독된 앱이 없습니다. 설정을 다시 저장해 구독하세요.",
       "wabaCheckFailed": "WABA 구독 확인 실패: {message}",
+      "wabaNotOwner": "Meta는 이 번호를 저장된 {configured}가 아닌 WhatsApp Business Account {owner}를 통해 라우팅합니다. 그래서 수신 메시지가 wacrm이 구독하지 않은 WABA로 전달됩니다. WABA ID를 {owner}로 변경하고 다시 저장하세요.",
+      "wabaWrongApp": "WABA가 다른 앱에는 구독되어 있지만 이 앱(META_APP_ID {appId})에는 구독되어 있지 않습니다. 이 앱용 액세스 토큰을 생성한 후 다시 저장하세요.",
       "noWabaId": "등록된 WABA ID가 없습니다 — WABA ID 없이는 웹훅을 연결할 수 없습니다. 양식에 추가한 후 다시 저장하세요."
     },
     "media": {
@@ -2715,6 +2756,358 @@
       "submitFailed": "템플릿을 제출하지 못했습니다.",
       "metaApiStatus": "Meta API 오류: {status}",
       "syncFailed": "템플릿을 동기화하지 못했습니다"
+    },
+    "billing": {
+      "readOnly": "평가판 또는 구독이 종료되어 이 워크스페이스는 읽기 전용입니다. 계속하려면 설정 → 결제 및 요금제에서 요금제를 선택하세요.",
+      "featureNotInPlan": "{feature}은(는) 현재 요금제에 포함되어 있지 않습니다. 설정 → 결제 및 요금제에서 업그레이드하세요.",
+      "features": {
+        "flows": "챗봇 플로우",
+        "ai": "AI 답장 및 에이전트",
+        "api": "공개 API 및 웹훅"
+      },
+      "limitReached": "현재 요금제에서는 {what}을(를) {limit}개까지 사용할 수 있습니다. 더 추가하려면 업그레이드하거나 추가 기능을 구매하세요.",
+      "limits": {
+        "seats": "팀 좌석",
+        "contacts": "연락처",
+        "broadcast_recipients_monthly": "월간 브로드캐스트 수신자",
+        "pipelines": "파이프라인",
+        "automations": "자동화",
+        "flows": "챗봇 플로우",
+        "api_keys": "API 키",
+        "webhook_endpoints": "웹훅 엔드포인트"
+      },
+      "broadcastQuota": "이 발송은 월간 브로드캐스트 한도를 초과합니다(수신자 {limit}명 중 {remaining}명 남음). 더 보내려면 요금제를 업그레이드하세요.",
+      "invalidGstin": "GSTIN 형식이 올바르지 않습니다. 15자여야 합니다(예: 22AAAAA0000A1Z5).",
+      "invalidEmail": "올바른 결제 이메일 주소를 입력하세요.",
+      "saveFailed": "결제 정보를 저장할 수 없습니다.",
+      "checkoutUnavailable": "이 서버에는 아직 온라인 결제가 설정되어 있지 않습니다.",
+      "invalidPlan": "이 요금제는 온라인으로 구매할 수 없습니다.",
+      "billingDisabled": "이 설치에서는 결제가 꺼져 있습니다.",
+      "providerError": "결제 서비스에서 오류를 반환했습니다: {message}",
+      "invalidPayment": "결제 정보가 누락되었습니다.",
+      "paymentNotPending": "이 결제는 워크스페이스에서 시작한 결제와 일치하지 않습니다.",
+      "invalidSignature": "결제 확인에 실패했습니다. 요금이 청구되었다면 몇 분 안에 자동으로 반영됩니다.",
+      "nothingToCancel": "취소할 활성 구독이 없습니다.",
+      "invalidAddon": "올바른 추가 기능과 1~100 사이의 수량을 선택하세요.",
+      "addonNeedsPlan": "추가 기능은 유료 요금제에서 사용할 수 있습니다. 먼저 요금제를 선택하세요.",
+      "addonManaged": "이 추가 기능은 계정 관리자가 부여한 것입니다. 변경하려면 관리자에게 문의하세요."
+    },
+    "demo": {
+      "blocked": "이 작업은 라이브 데모에서 사용할 수 없습니다. 내 WhatsApp 번호로 사용하려면 무료 평가판을 시작하세요.",
+      "disabled": "이 설치에서는 라이브 데모를 사용할 수 없습니다.",
+      "startFailed": "라이브 데모를 열 수 없습니다. 다시 시도하세요."
+    }
+  },
+  "Billing": {
+    "upgrade": {
+      "title": "계속하려면 업그레이드하세요",
+      "readOnlyTitle": "워크스페이스가 읽기 전용입니다",
+      "genericBody": "현재 요금제에서는 이 작업을 사용할 수 없습니다.",
+      "readOnlyBody": "평가판 또는 구독이 종료되어 워크스페이스가 읽기 전용입니다. 수신 메시지는 계속 저장됩니다. 다시 보내려면 요금제를 선택하세요.",
+      "featureBody": "{feature}은(는) 현재 요금제에 포함되어 있지 않습니다.",
+      "limitBody": "요금제 한도인 {what} {limit}개에 도달했습니다.",
+      "limitBodyNoNumber": "요금제의 {what} 한도에 도달했습니다.",
+      "currentPlan": "현재 요금제: {plan}",
+      "notNow": "나중에",
+      "seePlans": "요금제 보기"
+    },
+    "limits": {
+      "seats": "팀 좌석",
+      "contacts": "연락처",
+      "broadcast_recipients_monthly": "월간 브로드캐스트 수신자",
+      "pipelines": "파이프라인",
+      "automations": "자동화",
+      "flows": "챗봇 플로우",
+      "api_keys": "API 키",
+      "webhook_endpoints": "웹훅 엔드포인트"
+    },
+    "features": {
+      "flows": "챗봇 플로우",
+      "ai": "AI 답장 및 에이전트",
+      "api": "공개 API 및 웹훅"
+    },
+    "banner": {
+      "trialTitle": "무료 평가판이 {days}일 후 종료됩니다",
+      "trialBody": "받은편지함, 브로드캐스트, 자동화를 중단 없이 사용하려면 요금제를 선택하세요.",
+      "choosePlan": "요금제 선택",
+      "pastDueTitle": "결제 실패",
+      "pastDueBody": "마지막 갱신 결제를 처리하지 못했습니다. 워크스페이스가 읽기 전용이 되지 않도록 결제 수단을 업데이트하세요.",
+      "fixPayment": "결제 수정",
+      "canceledTitle": "구독이 {days}일 후 종료됩니다",
+      "canceledBody": "자동 갱신되지 않습니다. 언제든지 다시 구독하여 모든 기능을 계속 사용할 수 있습니다.",
+      "resubscribe": "다시 구독",
+      "renewTitle": "연간 요금제가 {days}일 후 종료됩니다",
+      "renewBody": "연간 요금제는 자동으로 갱신되지 않습니다. 중단을 피하려면 지금 갱신하세요. 새 기간은 현재 기간이 끝난 후 시작됩니다.",
+      "renew": "갱신",
+      "trialExpiredTitle": "무료 평가판이 종료되었습니다",
+      "expiredTitle": "구독이 종료되었습니다",
+      "suspendedTitle": "이 워크스페이스는 일시 중지되었습니다",
+      "suspendedBody": "접근을 복원하려면 지원팀에 문의하세요. 데이터는 안전합니다.",
+      "readOnlyBody": "워크스페이스가 읽기 전용입니다. 수신된 WhatsApp 메시지는 계속 저장되며, 요금제를 선택할 때까지 발송·브로드캐스트·자동화가 일시 중지됩니다."
+    },
+    "meters": {
+      "usedUnlimited": "{used} · 무제한",
+      "usedOf": "{used} / {limit}"
+    },
+    "plans": {
+      "intervalLabel": "결제 주기",
+      "monthly": "월간",
+      "annual": "연간",
+      "savePercent": "{percent}% 절약",
+      "mostPopular": "가장 인기",
+      "custom": "맞춤형",
+      "perMonth": "/월",
+      "billedYearly": "연 {amount} 청구",
+      "billedMonthly": "매월 청구",
+      "plusGst": "+{percent}% GST",
+      "unlimitedOf": "무제한 {what}",
+      "countOf": "{what} {count}개",
+      "contactSales": "영업팀 문의",
+      "currentPlan": "현재 요금제",
+      "switchInterval": "결제 주기 변경",
+      "choose": "{plan} 선택",
+      "annualNote": "연간 요금제는 12개월분을 한 번에 결제하며 자동 갱신되지 않습니다. WhatsApp 메시지 요금은 Meta가 별도로 청구합니다."
+    },
+    "states": {
+      "unlimited": "무제한",
+      "trialing": "평가판",
+      "active": "활성",
+      "past_due": "결제 필요",
+      "canceled": "취소됨",
+      "trial_expired": "평가판 종료",
+      "expired": "만료됨",
+      "suspended": "일시 중지됨"
+    },
+    "panel": {
+      "loading": "결제 정보를 불러오는 중…",
+      "title": "결제 및 요금제",
+      "description": "요금제, 사용량, 청구서.",
+      "disabledTitle": "결제가 꺼져 있습니다",
+      "disabledBody": "이 설치는 요금제나 한도 없이 운영되며 모든 기능을 무제한으로 사용할 수 있습니다.",
+      "openAdmin": "플랫폼 관리자 열기",
+      "trialEnds": "무료 평가판은 {date}에 종료됩니다({days}일 남음).",
+      "trialEnded": "무료 평가판이 {date}에 종료되었습니다.",
+      "endsOn": "{date}에 접근이 종료됩니다.",
+      "renewsOn": "{date}에 갱신됩니다.",
+      "pastDue": "마지막 갱신 결제가 실패했습니다. Razorpay가 다시 시도합니다. 계속 실패하면 결제 수단을 업데이트하세요.",
+      "suspended": "플랫폼 운영자가 일시 중지했습니다.",
+      "expiredOn": "{date}에 종료되었습니다.",
+      "checkoutFailed": "결제를 시작할 수 없습니다.",
+      "checkoutDescription": "{plan} 요금제 · {interval}",
+      "intervalMonthly": "월간",
+      "intervalAnnual": "연간",
+      "paymentProcessing": "결제가 접수되었습니다. 잠시 후 요금제가 업데이트됩니다.",
+      "paymentSuccess": "이제 {plan} 요금제를 사용 중입니다. 감사합니다!",
+      "cancelConfirm": "자동 갱신을 취소하시겠습니까? 현재 기간이 끝날 때까지 모든 기능을 계속 사용할 수 있습니다.",
+      "cancelFailed": "구독을 취소할 수 없습니다.",
+      "cancelDone": "자동 갱신이 취소되었습니다. {date}까지 계속 이용할 수 있습니다.",
+      "cancel": "구독 취소",
+      "plansTitle": "요금제",
+      "checkoutNotConfigured": "이 서버에는 아직 온라인 결제가 설정되어 있지 않습니다. 요금제를 변경하려면 플랫폼 운영자에게 문의하세요.",
+      "plansDescription": "언제든지 업그레이드하거나 변경할 수 있습니다. 가격은 GST 별도이며 WhatsApp 메시지 요금은 Meta가 청구합니다.",
+      "plansAdminOnly": "워크스페이스 소유자와 관리자만 요금제를 변경할 수 있습니다.",
+      "detailsTitle": "청구서 정보",
+      "detailsDescription": "GST 청구서에 표시됩니다.",
+      "historyTitle": "결제 내역",
+      "historyEmpty": "아직 결제 내역이 없습니다.",
+      "invoiceNote": "Razorpay가 모든 결제의 영수증을 결제 이메일로 보냅니다.",
+      "addonsTitle": "추가 기능",
+      "addonsDescription": "요금제를 바꾸지 않고 특정 한도만 늘리세요. 단위당 매월 청구되며 GST가 추가됩니다.",
+      "addonsNeedPlan": "추가 기능은 유료 요금제에서 사용할 수 있습니다. 먼저 요금제를 선택하세요.",
+      "checkoutAdminHint": "Razorpay가 아직 연결되지 않아 구매 버튼이 비활성화되어 있습니다. 결제를 받으려면 플랫폼 관리자에서 Razorpay 키를 추가하세요.",
+      "checkoutAdminLink": "결제 설정"
+    },
+    "details": {
+      "name": "회사명",
+      "email": "결제 이메일",
+      "gstin": "GSTIN(선택 사항)",
+      "gstinHint": "매입세액 공제를 받으려면 입력하세요.",
+      "state": "주",
+      "address": "청구지 주소",
+      "save": "정보 저장",
+      "saved": "결제 정보가 저장되었습니다.",
+      "saveFailed": "결제 정보를 저장할 수 없습니다."
+    },
+    "sidebar": {
+      "daysLeft": "{days}일 남음",
+      "readOnly": "읽기 전용",
+      "upgrade": "요금제 업그레이드 →"
+    },
+    "demo": {
+      "title": "라이브 데모를 둘러보는 중입니다",
+      "body": "공유 샘플 워크스페이스입니다. 데이터는 매일 밤 초기화되며 실제 WhatsApp 번호로 메시지가 발송되지 않습니다.",
+      "cta": "무료 평가판 시작"
+    },
+    "addons": {
+      "perUnit": "단위당 / 월",
+      "active": "{quantity}개 사용 중",
+      "ending": "이번 달 종료",
+      "managed": "계정 관리자가 포함한 항목입니다.",
+      "decrease": "수량 줄이기",
+      "increase": "수량 늘리기",
+      "buy": "구매",
+      "update": "변경",
+      "stop": "중지",
+      "stopConfirm": "이 추가 기능의 갱신을 중지하시겠습니까? 이번 달 말까지는 계속 사용할 수 있습니다.",
+      "stopped": "추가 기능이 이번 달 말에 중지됩니다.",
+      "added": "{addon}이(가) 추가되었습니다.",
+      "processing": "결제가 접수되었습니다. 잠시 후 추가 기능이 표시됩니다.",
+      "failed": "추가 기능을 변경할 수 없습니다.",
+      "checkoutDescription": "{addon} × {quantity} (월간)"
+    }
+  },
+  "Admin": {
+    "forbidden": "플랫폼 관리자 콘솔에 접근할 권한이 없습니다.",
+    "loading": "불러오는 중…",
+    "loadFailed": "관리자 콘솔을 불러올 수 없습니다.",
+    "title": "플랫폼 관리자",
+    "description": "이 설치의 결제 스위치, 요금제, 모든 워크스페이스.",
+    "metrics": {
+      "workspaces": "워크스페이스",
+      "trialing": "평가판",
+      "paying": "유료",
+      "pastDue": "결제 필요",
+      "lapsed": "만료",
+      "mrr": "MRR(GST 제외)"
+    },
+    "settings": {
+      "title": "결제 설정",
+      "description": "플랫폼 전체 스위치입니다. 결제를 켜면 모든 워크스페이스에 요금제와 한도가 적용됩니다.",
+      "enableConfirm": "결제를 켜시겠습니까? 모든 워크스페이스에 요금제 한도가 적용되며 만료된 평가판은 읽기 전용이 됩니다.",
+      "saveFailed": "설정을 저장할 수 없습니다.",
+      "saved": "설정이 저장되었습니다.",
+      "trial_days": "평가판 기간(일)",
+      "grace_days": "결제 실패 또는 종료 후 유예 기간(일)",
+      "gst_percent": "GST %",
+      "billingEnabled": "결제 사용",
+      "billingEnabledHint": "끄면 자체 호스팅 모드: 요금제·한도·결제가 없습니다.",
+      "razorpayKeys": "Razorpay API 키",
+      "razorpayWebhook": "Razorpay 웹훅 시크릿",
+      "save": "설정 저장",
+      "configurePayments": "결제 설정 →"
+    },
+    "plans": {
+      "title": "요금제",
+      "description": "가격은 루피 기준이며 GST 별도입니다. 한도를 비워 두면 무제한입니다.",
+      "save": "요금제 저장",
+      "saveFailed": "요금제를 저장할 수 없습니다.",
+      "saved": "요금제가 저장되었습니다.",
+      "name": "요금제 이름",
+      "public": "공개",
+      "highlighted": "가장 인기",
+      "monthly": "월 가격(₹)",
+      "annual": "연 가격(₹, 1년 전체)",
+      "unlimited": "무제한",
+      "preview": "{monthly}/월로 표시됨",
+      "priceChangeNote": "월 가격을 변경하면 다음 결제 시 새 Razorpay 요금제가 생성됩니다. 기존 구독자는 현재 가격을 유지합니다."
+    },
+    "accounts": {
+      "title": "워크스페이스",
+      "description": "워크스페이스 {count}개",
+      "search": "이름 또는 소유자 이메일로 검색",
+      "workspace": "워크스페이스",
+      "plan": "요금제",
+      "status": "상태",
+      "renewsOrEnds": "갱신 / 종료",
+      "usage": "사용량",
+      "empty": "워크스페이스가 없습니다.",
+      "since": "{date}부터",
+      "usageLine": "좌석 {seats} · 연락처 {contacts}",
+      "manage": "관리",
+      "prev": "이전",
+      "next": "다음",
+      "pageOf": "{pages}페이지 중 {page}페이지",
+      "demo": "라이브 데모"
+    },
+    "manage": {
+      "plan": "요금제",
+      "status": "상태",
+      "interval": "결제 주기",
+      "monthly": "월간",
+      "annual": "연간",
+      "trialEnds": "평가판 종료일",
+      "extend": "+{days}일",
+      "periodEnds": "결제 만료일",
+      "periodHint": "수동/청구서 거래의 경우 상태를 활성으로 설정하고 결제 만료일을 지정하세요.",
+      "addons": "추가 기능",
+      "overrides": "한도 재정의",
+      "overridesHint": "이 워크스페이스에만 요금제 한도를 대체합니다. 숫자, \"unlimited\" 또는 비워 두면 요금제 기본값입니다.",
+      "planDefault": "요금제 기본값",
+      "suspend": "워크스페이스 일시 중지",
+      "suspendHint": "모든 사용자에게 읽기 전용이 되며 수신 메시지는 계속 저장됩니다.",
+      "cancel": "취소",
+      "save": "변경 사항 저장",
+      "saved": "워크스페이스가 업데이트되었습니다.",
+      "saveFailed": "워크스페이스를 업데이트할 수 없습니다."
+    },
+    "statuses": {
+      "trialing": "평가판",
+      "active": "활성",
+      "past_due": "결제 필요",
+      "canceled": "취소됨",
+      "expired": "만료됨"
+    },
+    "payments": {
+      "title": "결제 (Razorpay)",
+      "description": "고객이 요금제와 추가 기능을 구매할 수 있도록 Razorpay를 연결하세요. 시크릿은 암호화되어 저장되며 저장 후에는 다시 표시되지 않습니다.",
+      "modeLive": "라이브 모드",
+      "modeTest": "테스트 모드",
+      "apiKeys": "API 키",
+      "webhookSecret": "웹훅 시크릿",
+      "fromEnv": "환경 변수",
+      "fromAdmin": "여기에 저장됨",
+      "envLocked": "키가 서버 환경 변수로 설정되어 있어 우선 적용됩니다. 여기서 관리하려면 환경 변수에서 제거하세요.",
+      "keyId": "Key ID",
+      "keySecret": "Key secret",
+      "savedKeep": "저장됨 — 유지하려면 비워 두세요",
+      "webhookSecretHint": "Razorpay 웹훅에 설정한 시크릿",
+      "webhookSetupTitle": "Razorpay 웹훅",
+      "webhookSetupBody": "Razorpay Dashboard → Webhooks에서 이 URL을 추가하고, 시크릿을 설정한 뒤(위에 같은 값을 붙여넣기) 다음 이벤트를 선택하세요:",
+      "copy": "복사",
+      "copied": "웹훅 URL이 복사되었습니다",
+      "events": "활성화할 이벤트",
+      "save": "결제 설정 저장",
+      "saved": "결제 설정이 저장되었습니다.",
+      "saveFailed": "결제 설정을 저장할 수 없습니다.",
+      "test": "연결 테스트",
+      "testOk": "Razorpay가 키를 승인했습니다.",
+      "testFailed": "Razorpay가 키를 거부했습니다: {error}",
+      "clear": "저장된 키 삭제",
+      "clearConfirm": "여기에 저장된 Razorpay 키를 삭제하시겠습니까? 새 키를 추가할 때까지 결제가 작동하지 않습니다.",
+      "cleared": "저장된 키가 삭제되었습니다."
+    }
+  },
+  "Emails": {
+    "billing": {
+      "footer": "{brand} 워크스페이스의 결제를 관리하고 있어 이 메일을 받으셨습니다.",
+      "trialEnding": {
+        "subject": "{brand} 평가판이 {days}일 후 종료됩니다",
+        "heading": "무료 평가판이 {days}일 후 종료됩니다",
+        "body": "{workspace}의 무료 평가판이 {date}에 종료됩니다. 받은편지함, 브로드캐스트, 자동화를 중단 없이 사용하려면 지금 요금제를 선택하세요.",
+        "body2": "아무것도 하지 않으면 워크스페이스가 읽기 전용이 됩니다. 데이터는 삭제되지 않으며 WhatsApp 메시지는 계속 수신됩니다.",
+        "cta": "요금제 선택"
+      },
+      "trialEnded": {
+        "subject": "{brand} 평가판이 종료되었습니다",
+        "heading": "무료 평가판이 종료되었습니다",
+        "body": "{workspace}의 무료 평가판이 {date}에 종료되어 워크스페이스가 읽기 전용이 되었습니다.",
+        "body2": "데이터는 안전하며 수신 메시지는 계속 저장됩니다. 다시 보내려면 요금제를 선택하세요.",
+        "cta": "요금제 선택"
+      },
+      "paymentFailed": {
+        "subject": "{brand} 구독 결제에 실패했습니다",
+        "heading": "결제를 처리하지 못했습니다",
+        "body": "{workspace}의 최근 갱신 결제가 실패했습니다. Razorpay가 자동으로 다시 시도합니다.",
+        "body2": "워크스페이스가 읽기 전용이 되지 않도록 {date} 전에 결제 수단을 업데이트하세요.",
+        "cta": "결제 수단 업데이트"
+      },
+      "renewal": {
+        "subject": "{brand} 연간 요금제가 {days}일 후 종료됩니다",
+        "heading": "연간 요금제를 갱신할 때입니다",
+        "body": "{workspace}의 연간 요금제가 {date}에 종료됩니다. 연간 요금제는 자동으로 갱신되지 않습니다.",
+        "body2": "지금 갱신하세요. 새 기간은 현재 기간이 끝난 후 시작되므로 손해 보는 날이 없습니다.",
+        "cta": "요금제 갱신"
+      }
     }
   }
 }

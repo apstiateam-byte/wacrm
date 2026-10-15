@@ -41,7 +41,15 @@
     "defaultAvatar": "Avatar",
     "menuProfile": "Perfil",
     "menuSettings": "Configuración",
-    "menuSignOut": "Cerrar sesión"
+    "menuSignOut": "Cerrar sesión",
+    "platformAdmin": "Admin de la plataforma",
+    "groups": {
+      "engage": "Interactuar",
+      "grow": "Crecer",
+      "sell": "Vender"
+    },
+    "collapseSidebar": "Contraer barra lateral",
+    "expandSidebar": "Expandir barra lateral"
   },
   "Header": {
     "dashboard": "Panel",
@@ -58,7 +66,10 @@
     "defaultAvatar": "Avatar",
     "menuProfile": "Perfil",
     "menuSettings": "Configuración",
-    "menuSignOut": "Cerrar sesión"
+    "menuSignOut": "Cerrar sesión",
+    "flows": "Flujos",
+    "agents": "Agentes de IA",
+    "admin": "Admin de la plataforma"
   },
   "ModeToggle": {
     "switchMode": "Cambiar al modo {mode}"
@@ -154,6 +165,33 @@
     },
     "emptyState": {
       "title": "Aún no hay datos suficientes"
+    },
+    "onboarding": {
+      "title": "Primeros pasos",
+      "progress": "{done} de {total} pasos completados",
+      "dismiss": "Ocultar lista",
+      "steps": {
+        "whatsapp": {
+          "title": "Conectar WhatsApp",
+          "body": "Vincula tu número de WhatsApp Business"
+        },
+        "template": {
+          "title": "Añadir una plantilla",
+          "body": "Crea o sincroniza una plantilla de mensaje aprobada"
+        },
+        "contacts": {
+          "title": "Importar contactos",
+          "body": "Sube un CSV o añade tu primer contacto"
+        },
+        "team": {
+          "title": "Invitar a tu equipo",
+          "body": "Suma agentes para compartir la bandeja de entrada"
+        },
+        "broadcast": {
+          "title": "Enviar una difusión",
+          "body": "Llega de una vez a los clientes que aceptaron recibir mensajes"
+        }
+      }
     }
   },
   "Inbox": {
@@ -1784,7 +1822,8 @@
       "fields": "Campos y etiquetas",
       "deals": "Negocios y moneda",
       "members": "Miembros del equipo",
-      "api": "Claves de API"
+      "api": "Claves de API",
+      "billing": "Facturación y plan"
     },
     "groups": {
       "account": "Cuenta",
@@ -2671,6 +2710,8 @@
       "phoneCheckFailed": "Falló la verificación de los datos del número: {message}",
       "wabaNoApps": "La WABA no tiene apps suscritas. Vuelve a guardar la configuración para suscribirla.",
       "wabaCheckFailed": "Falló la verificación de la suscripción de la WABA: {message}",
+      "wabaNotOwner": "Meta enruta este número por la WhatsApp Business Account {owner}, no por la {configured} guardada, así que los mensajes entrantes van a una WABA que wacrm nunca suscribió. Cambia el WABA ID a {owner} y vuelve a guardar.",
+      "wabaWrongApp": "La WABA está suscrita a otras apps, pero no a esta app (META_APP_ID {appId}). Genera el token de acceso para esta app y vuelve a guardar.",
       "noWabaId": "No hay ningún WABA ID registrado; los webhooks no se pueden conectar sin él. Agrégalo en el formulario y vuelve a guardar."
     },
     "media": {
@@ -2715,6 +2756,358 @@
       "submitFailed": "Error al enviar la plantilla.",
       "metaApiStatus": "Error de la API de Meta: {status}",
       "syncFailed": "Error al sincronizar las plantillas"
+    },
+    "billing": {
+      "readOnly": "Este espacio de trabajo es de solo lectura porque su prueba o suscripción terminó. Elige un plan en Configuración → Facturación y plan para continuar.",
+      "featureNotInPlan": "{feature} no está incluido en tu plan actual. Mejora tu plan en Configuración → Facturación y plan.",
+      "features": {
+        "flows": "Flujos de chatbot",
+        "ai": "Respuestas y agentes de IA",
+        "api": "API pública y webhooks"
+      },
+      "limitReached": "Tu plan permite {limit} {what}. Mejora tu plan o compra un complemento para añadir más.",
+      "limits": {
+        "seats": "puestos de equipo",
+        "contacts": "contactos",
+        "broadcast_recipients_monthly": "destinatarios de difusión al mes",
+        "pipelines": "embudos",
+        "automations": "automatizaciones",
+        "flows": "flujos de chatbot",
+        "api_keys": "claves de API",
+        "webhook_endpoints": "endpoints de webhook"
+      },
+      "broadcastQuota": "Este envío superaría tu cuota mensual de difusión (quedan {remaining} de {limit} destinatarios). Mejora tu plan para enviar más.",
+      "invalidGstin": "Ese GSTIN no parece correcto. Debe tener 15 caracteres, p. ej. 22AAAAA0000A1Z5.",
+      "invalidEmail": "Introduce un correo de facturación válido.",
+      "saveFailed": "No se pudieron guardar los datos de facturación.",
+      "checkoutUnavailable": "Los pagos en línea aún no están configurados en este servidor.",
+      "invalidPlan": "Ese plan no se puede comprar en línea.",
+      "billingDisabled": "La facturación está desactivada en esta instalación.",
+      "providerError": "El proveedor de pagos devolvió un error: {message}",
+      "invalidPayment": "Faltan datos del pago.",
+      "paymentNotPending": "Este pago no corresponde a un checkout iniciado por tu espacio de trabajo.",
+      "invalidSignature": "La verificación del pago falló. Si se te cobró, se aplicará automáticamente en unos minutos.",
+      "nothingToCancel": "No hay ninguna suscripción activa que cancelar.",
+      "invalidAddon": "Elige un complemento válido y una cantidad entre 1 y 100.",
+      "addonNeedsPlan": "Los complementos están disponibles en los planes de pago. Elige un plan primero.",
+      "addonManaged": "Este complemento lo concedió tu gestor de cuenta; contacta con él para cambiarlo."
+    },
+    "demo": {
+      "blocked": "Esta acción está desactivada en la demostración en vivo. Empieza una prueba gratuita para usarla con tu propio número de WhatsApp.",
+      "disabled": "La demostración en vivo no está disponible en esta instalación.",
+      "startFailed": "No se pudo abrir la demostración en vivo. Inténtalo de nuevo."
+    }
+  },
+  "Billing": {
+    "upgrade": {
+      "title": "Mejora tu plan para continuar",
+      "readOnlyTitle": "Tu espacio de trabajo es de solo lectura",
+      "genericBody": "Esta acción no está disponible en tu plan actual.",
+      "readOnlyBody": "Tu prueba o suscripción terminó, así que el espacio de trabajo es de solo lectura. Los mensajes entrantes se siguen guardando. Elige un plan para volver a enviar.",
+      "featureBody": "{feature} no está incluido en tu plan actual.",
+      "limitBody": "Alcanzaste el límite de tu plan de {limit} {what}.",
+      "limitBodyNoNumber": "Alcanzaste el límite de tu plan para {what}.",
+      "currentPlan": "Plan actual: {plan}",
+      "notNow": "Ahora no",
+      "seePlans": "Ver planes"
+    },
+    "limits": {
+      "seats": "Puestos de equipo",
+      "contacts": "Contactos",
+      "broadcast_recipients_monthly": "Destinatarios de difusión / mes",
+      "pipelines": "Embudos",
+      "automations": "Automatizaciones",
+      "flows": "Flujos de chatbot",
+      "api_keys": "Claves de API",
+      "webhook_endpoints": "Endpoints de webhook"
+    },
+    "features": {
+      "flows": "Flujos de chatbot",
+      "ai": "Respuestas y agentes de IA",
+      "api": "API pública y webhooks"
+    },
+    "banner": {
+      "trialTitle": "Tu prueba gratuita termina en {days, plural, =0 {menos de un día} one {# día} other {# días}}",
+      "trialBody": "Elige un plan para que tu bandeja de entrada, difusiones y automatizaciones sigan funcionando sin interrupciones.",
+      "choosePlan": "Elegir un plan",
+      "pastDueTitle": "Falló el pago",
+      "pastDueBody": "No pudimos cobrar tu última renovación. Actualiza tu método de pago para evitar que el espacio de trabajo quede en solo lectura.",
+      "fixPayment": "Corregir pago",
+      "canceledTitle": "Tu suscripción termina en {days, plural, =0 {menos de un día} one {# día} other {# días}}",
+      "canceledBody": "No se renovará. Vuelve a suscribirte cuando quieras para mantener el acceso completo.",
+      "resubscribe": "Volver a suscribirse",
+      "renewTitle": "Tu plan anual termina en {days, plural, =0 {menos de un día} one {# día} other {# días}}",
+      "renewBody": "Los planes anuales no se renuevan automáticamente. Renueva ahora para evitar interrupciones: el nuevo año empieza cuando termina el actual.",
+      "renew": "Renovar",
+      "trialExpiredTitle": "Tu prueba gratuita terminó",
+      "expiredTitle": "Tu suscripción terminó",
+      "suspendedTitle": "Este espacio de trabajo está suspendido",
+      "suspendedBody": "Contacta con soporte para restaurar el acceso. Tus datos están a salvo.",
+      "readOnlyBody": "El espacio de trabajo es de solo lectura. Los mensajes de WhatsApp entrantes se siguen guardando; los envíos, difusiones y automatizaciones quedan en pausa hasta que elijas un plan."
+    },
+    "meters": {
+      "usedUnlimited": "{used} · Ilimitado",
+      "usedOf": "{used} de {limit}"
+    },
+    "plans": {
+      "intervalLabel": "Período de facturación",
+      "monthly": "Mensual",
+      "annual": "Anual",
+      "savePercent": "Ahorra {percent}%",
+      "mostPopular": "Más popular",
+      "custom": "Personalizado",
+      "perMonth": "/mes",
+      "billedYearly": "Facturado {amount} al año",
+      "billedMonthly": "Facturado mensualmente",
+      "plusGst": "+{percent}% de GST",
+      "unlimitedOf": "{what} ilimitados",
+      "countOf": "{count} {what}",
+      "contactSales": "Contactar con ventas",
+      "currentPlan": "Plan actual",
+      "switchInterval": "Cambiar período de facturación",
+      "choose": "Elegir {plan}",
+      "annualNote": "Los planes anuales son un pago único por 12 meses y no se renuevan automáticamente. Meta factura aparte las tarifas de mensajes de WhatsApp."
+    },
+    "states": {
+      "unlimited": "Ilimitado",
+      "trialing": "Prueba",
+      "active": "Activo",
+      "past_due": "Pago pendiente",
+      "canceled": "Cancelado",
+      "trial_expired": "Prueba terminada",
+      "expired": "Vencido",
+      "suspended": "Suspendido"
+    },
+    "panel": {
+      "loading": "Cargando facturación…",
+      "title": "Facturación y plan",
+      "description": "Tu plan, uso y facturas.",
+      "disabledTitle": "La facturación está desactivada",
+      "disabledBody": "Esta instalación funciona sin planes ni límites: todas las funciones son ilimitadas.",
+      "openAdmin": "Abrir admin de la plataforma",
+      "trialEnds": "La prueba gratuita termina el {date} ({days, plural, =0 {hoy} one {queda # día} other {quedan # días}}).",
+      "trialEnded": "La prueba gratuita terminó el {date}.",
+      "endsOn": "El acceso termina el {date}.",
+      "renewsOn": "Se renueva el {date}.",
+      "pastDue": "El último pago de renovación falló. Razorpay lo volverá a intentar; actualiza tu método de pago si sigue fallando.",
+      "suspended": "Suspendido por el operador de la plataforma.",
+      "expiredOn": "Terminó el {date}.",
+      "checkoutFailed": "No se pudo iniciar el checkout.",
+      "checkoutDescription": "Plan {plan} · {interval}",
+      "intervalMonthly": "Mensual",
+      "intervalAnnual": "Anual",
+      "paymentProcessing": "Pago recibido: tu plan se actualizará en un momento.",
+      "paymentSuccess": "Ya estás en el plan {plan}. ¡Gracias!",
+      "cancelConfirm": "¿Cancelar la renovación automática? Mantienes el acceso completo hasta el final del período actual.",
+      "cancelFailed": "No se pudo cancelar la suscripción.",
+      "cancelDone": "Renovación automática cancelada. El acceso continúa hasta el {date}.",
+      "cancel": "Cancelar suscripción",
+      "plansTitle": "Planes",
+      "checkoutNotConfigured": "El pago en línea aún no está configurado en este servidor. Contacta con el operador de la plataforma para cambiar de plan.",
+      "plansDescription": "Mejora o cambia cuando quieras. Precios sin GST; Meta factura las tarifas de mensajes de WhatsApp.",
+      "plansAdminOnly": "Solo los propietarios y administradores del espacio de trabajo pueden cambiar el plan.",
+      "detailsTitle": "Datos de factura",
+      "detailsDescription": "Aparecen en tus facturas con GST.",
+      "historyTitle": "Historial de pagos",
+      "historyEmpty": "Aún no hay pagos.",
+      "invoiceNote": "Razorpay envía un recibo de cada pago al correo de facturación.",
+      "addonsTitle": "Complementos",
+      "addonsDescription": "Aumenta un límite concreto sin cambiar de plan. Facturado mensualmente por unidad, más GST.",
+      "addonsNeedPlan": "Los complementos están disponibles en los planes de pago. Elige un plan primero.",
+      "checkoutAdminHint": "Los botones de compra están desactivados porque Razorpay aún no está conectado. Añade tus claves de Razorpay en el admin de la plataforma para empezar a cobrar.",
+      "checkoutAdminLink": "Configurar pagos"
+    },
+    "details": {
+      "name": "Nombre de la empresa",
+      "email": "Correo de facturación",
+      "gstin": "GSTIN (opcional)",
+      "gstinHint": "Añádelo para aprovechar el crédito fiscal.",
+      "state": "Estado",
+      "address": "Dirección de facturación",
+      "save": "Guardar datos",
+      "saved": "Datos de facturación guardados.",
+      "saveFailed": "No se pudieron guardar los datos de facturación."
+    },
+    "sidebar": {
+      "daysLeft": "{days, plural, =0 {Termina hoy} one {Queda # día} other {Quedan # días}}",
+      "readOnly": "Solo lectura",
+      "upgrade": "Mejorar plan →"
+    },
+    "demo": {
+      "title": "Estás explorando la demostración en vivo",
+      "body": "Es un espacio de trabajo de ejemplo compartido. Los datos se restablecen cada noche y los mensajes no se envían a números reales de WhatsApp.",
+      "cta": "Empezar prueba gratuita"
+    },
+    "addons": {
+      "perUnit": "por unidad / mes",
+      "active": "{quantity} activos",
+      "ending": "Termina este mes",
+      "managed": "Incluido por tu gestor de cuenta.",
+      "decrease": "Reducir cantidad",
+      "increase": "Aumentar cantidad",
+      "buy": "Comprar",
+      "update": "Actualizar",
+      "stop": "Detener",
+      "stopConfirm": "¿Dejar de renovar este complemento? Seguirá activo hasta el final del mes actual.",
+      "stopped": "El complemento se detendrá al final del mes.",
+      "added": "{addon} añadido.",
+      "processing": "Pago recibido: el complemento aparecerá en un momento.",
+      "failed": "No se pudo actualizar el complemento.",
+      "checkoutDescription": "{addon} × {quantity} (mensual)"
+    }
+  },
+  "Admin": {
+    "forbidden": "No tienes acceso a la consola de administración de la plataforma.",
+    "loading": "Cargando…",
+    "loadFailed": "No se pudo cargar la consola de administración.",
+    "title": "Admin de la plataforma",
+    "description": "Interruptores de facturación, planes y todos los espacios de trabajo de esta instalación.",
+    "metrics": {
+      "workspaces": "Espacios de trabajo",
+      "trialing": "En prueba",
+      "paying": "De pago",
+      "pastDue": "Pago pendiente",
+      "lapsed": "Vencidos",
+      "mrr": "MRR (sin GST)"
+    },
+    "settings": {
+      "title": "Configuración de facturación",
+      "description": "Interruptores de toda la plataforma. Activar la facturación empieza a aplicar planes y límites a todos los espacios de trabajo.",
+      "enableConfirm": "¿Activar la facturación? Todos los espacios de trabajo quedarán sujetos a los límites de su plan y las pruebas vencidas pasarán a solo lectura.",
+      "saveFailed": "No se pudo guardar la configuración.",
+      "saved": "Configuración guardada.",
+      "trial_days": "Duración de la prueba (días)",
+      "grace_days": "Período de gracia tras un pago fallido o terminado (días)",
+      "gst_percent": "GST %",
+      "billingEnabled": "Facturación activada",
+      "billingEnabledHint": "Desactivada = modo autoalojado: sin planes, sin límites, nada que pagar.",
+      "razorpayKeys": "Claves de API de Razorpay",
+      "razorpayWebhook": "Secreto del webhook de Razorpay",
+      "save": "Guardar configuración",
+      "configurePayments": "Configurar pagos →"
+    },
+    "plans": {
+      "title": "Planes",
+      "description": "Precios en rupias, sin GST. Deja un límite vacío para ilimitado.",
+      "save": "Guardar planes",
+      "saveFailed": "No se pudieron guardar los planes.",
+      "saved": "Planes guardados.",
+      "name": "Nombre del plan",
+      "public": "Público",
+      "highlighted": "Más popular",
+      "monthly": "Precio mensual (₹)",
+      "annual": "Precio anual (₹, año completo)",
+      "unlimited": "Ilimitado",
+      "preview": "Se muestra como {monthly}/mes",
+      "priceChangeNote": "Cambiar un precio mensual crea un nuevo plan en Razorpay en el siguiente checkout. Los suscriptores actuales conservan su precio."
+    },
+    "accounts": {
+      "title": "Espacios de trabajo",
+      "description": "{count, plural, one {# espacio de trabajo} other {# espacios de trabajo}}",
+      "search": "Buscar por nombre o correo del propietario",
+      "workspace": "Espacio de trabajo",
+      "plan": "Plan",
+      "status": "Estado",
+      "renewsOrEnds": "Renueva / termina",
+      "usage": "Uso",
+      "empty": "No se encontraron espacios de trabajo.",
+      "since": "desde {date}",
+      "usageLine": "{seats} puestos · {contacts} contactos",
+      "manage": "Gestionar",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "pageOf": "Página {page} de {pages}",
+      "demo": "Demo en vivo"
+    },
+    "manage": {
+      "plan": "Plan",
+      "status": "Estado",
+      "interval": "Período de facturación",
+      "monthly": "Mensual",
+      "annual": "Anual",
+      "trialEnds": "Fin de la prueba",
+      "extend": "+{days} días",
+      "periodEnds": "Pagado hasta",
+      "periodHint": "Para acuerdos manuales / por factura: establece el estado Activo y una fecha de pago.",
+      "addons": "Complementos",
+      "overrides": "Sustituciones de límites",
+      "overridesHint": "Sustituye un límite del plan solo para este espacio de trabajo. Un número, \"unlimited\" o vacío para el valor del plan.",
+      "planDefault": "Valor del plan",
+      "suspend": "Suspender espacio de trabajo",
+      "suspendHint": "Solo lectura para todos; los mensajes entrantes se siguen guardando.",
+      "cancel": "Cancelar",
+      "save": "Guardar cambios",
+      "saved": "Espacio de trabajo actualizado.",
+      "saveFailed": "No se pudo actualizar el espacio de trabajo."
+    },
+    "statuses": {
+      "trialing": "Prueba",
+      "active": "Activo",
+      "past_due": "Pago pendiente",
+      "canceled": "Cancelado",
+      "expired": "Vencido"
+    },
+    "payments": {
+      "title": "Pagos (Razorpay)",
+      "description": "Conecta Razorpay para que los clientes puedan comprar planes y complementos. Los secretos se guardan cifrados y no se vuelven a mostrar tras guardarlos.",
+      "modeLive": "Modo producción",
+      "modeTest": "Modo prueba",
+      "apiKeys": "Claves de API",
+      "webhookSecret": "Secreto del webhook",
+      "fromEnv": "del entorno",
+      "fromAdmin": "guardado aquí",
+      "envLocked": "Las claves están definidas como variables de entorno en el servidor, que tienen prioridad. Quítalas allí para gestionarlas aquí.",
+      "keyId": "Key ID",
+      "keySecret": "Key secret",
+      "savedKeep": "Guardado: déjalo en blanco para conservarlo",
+      "webhookSecretHint": "El secreto que configuraste en el webhook de Razorpay",
+      "webhookSetupTitle": "Webhook de Razorpay",
+      "webhookSetupBody": "En Razorpay Dashboard → Webhooks, añade esta URL, define un secreto (pega el mismo arriba) y marca estos eventos:",
+      "copy": "Copiar",
+      "copied": "URL del webhook copiada",
+      "events": "Eventos que activar",
+      "save": "Guardar configuración de pagos",
+      "saved": "Configuración de pagos guardada.",
+      "saveFailed": "No se pudo guardar la configuración de pagos.",
+      "test": "Probar conexión",
+      "testOk": "Razorpay aceptó las claves.",
+      "testFailed": "Razorpay rechazó las claves: {error}",
+      "clear": "Quitar claves guardadas",
+      "clearConfirm": "¿Quitar las claves de Razorpay guardadas aquí? El checkout dejará de funcionar hasta que añadas otras.",
+      "cleared": "Claves guardadas eliminadas."
+    }
+  },
+  "Emails": {
+    "billing": {
+      "footer": "Recibes esto porque gestionas la facturación de un espacio de trabajo de {brand}.",
+      "trialEnding": {
+        "subject": "Tu prueba de {brand} termina en {days, plural, one {# día} other {# días}}",
+        "heading": "Tu prueba gratuita termina en {days, plural, one {# día} other {# días}}",
+        "body": "La prueba gratuita de {workspace} termina el {date}. Elige un plan ahora para que tu bandeja de entrada, difusiones y automatizaciones sigan funcionando sin interrupciones.",
+        "body2": "Si no haces nada, el espacio de trabajo pasará a solo lectura: no se elimina nada y los mensajes de WhatsApp siguen llegando.",
+        "cta": "Elegir un plan"
+      },
+      "trialEnded": {
+        "subject": "Tu prueba de {brand} terminó",
+        "heading": "Tu prueba gratuita terminó",
+        "body": "La prueba gratuita de {workspace} terminó el {date}, así que el espacio de trabajo ahora es de solo lectura.",
+        "body2": "Tus datos están a salvo y los mensajes entrantes se siguen guardando. Elige un plan para volver a enviar.",
+        "cta": "Elegir un plan"
+      },
+      "paymentFailed": {
+        "subject": "Falló el pago de tu suscripción de {brand}",
+        "heading": "No pudimos procesar tu pago",
+        "body": "El último pago de renovación de {workspace} falló. Razorpay lo volverá a intentar automáticamente.",
+        "body2": "Actualiza tu método de pago antes del {date} para evitar que el espacio de trabajo pase a solo lectura.",
+        "cta": "Actualizar pago"
+      },
+      "renewal": {
+        "subject": "Tu plan anual de {brand} termina en {days, plural, one {# día} other {# días}}",
+        "heading": "Es hora de renovar tu plan anual",
+        "body": "El plan anual de {workspace} termina el {date}. Los planes anuales no se renuevan automáticamente.",
+        "body2": "Renueva ahora: el nuevo año empieza cuando termina el actual, así que no pierdes ningún día.",
+        "cta": "Renovar plan"
+      }
     }
   }
 }

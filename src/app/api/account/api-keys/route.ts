@@ -24,6 +24,8 @@ import {
   requireRole,
   toErrorResponse,
 } from '@/lib/auth/account';
+import { assertFeature } from '@/lib/billing/server';
+import { assertNotDemo } from '@/lib/demo/server';
 import { generateApiKey } from '@/lib/api-keys/keys';
 import { normalizeScopes } from '@/lib/api-keys/scopes';
 import {
@@ -74,6 +76,8 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const ctx = await requireRole('admin');
+    await assertNotDemo(ctx.accountId);
+    await assertFeature(ctx.accountId, 'api');
 
     const limit = checkRateLimit(
       `admin:apiKeyCreate:${ctx.userId}`,

@@ -321,6 +321,42 @@ export async function getSubscribedApps(
   return data.data ?? []
 }
 
+export interface GetPhoneNumberOwningWabaArgs {
+  phoneNumberId: string
+  accessToken: string
+}
+
+export interface PhoneHealthStatus {
+  entities?: Array<{ entity_type?: string; id?: string }>
+}
+
+/**
+ * Ask Meta which WABA a phone number actually belongs to, read from the
+ * `WABA` entity of the number's `health_status`.
+ *
+ * `GET /{waba_id}/phone_numbers` is not proof on its own: it has been
+ * seen listing a number under a WABA id that is *not* the one Meta
+ * routes the number's webhooks through. Subscribing that id succeeds,
+ * Meta's dashboard "Test" button still reaches the webhook, and real
+ * inbound messages never arrive. `health_status` names the owning WABA
+ * directly. Returns null when Meta omits it.
+ */
+export async function getPhoneNumberOwningWabaId(
+  args: GetPhoneNumberOwningWabaArgs
+): Promise<string | null> {
+  const { phoneNumberId, accessToken } = args
+  const url = `${META_API_BASE}/${phoneNumberId}?fields=health_status`
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+  if (!response.ok) {
+    await throwMetaError(response, `Meta API error: ${response.status}`)
+  }
+  const data = (await response.json()) as { health_status?: PhoneHealthStatus }
+  const waba = data.health_status?.entities?.find((e) => e.entity_type === 'WABA')
+  return waba?.id ? String(waba.id) : null
+}
+
 // ============================================================
 // Sending
 // ============================================================

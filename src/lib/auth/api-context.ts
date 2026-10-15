@@ -30,6 +30,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 import { supabaseAdmin } from '@/lib/flows/admin-client';
+import { assertFeature, hasFeature, PlanLimitError } from '@/lib/billing/server';
 import { findActiveKeyByHash, touchLastUsed } from '@/lib/api-keys/store';
 import { hashApiKey, looksLikeApiKey } from '@/lib/api-keys/keys';
 import { hasScope, type ApiScope } from '@/lib/api-keys/scopes';
@@ -103,6 +104,18 @@ export async function requireApiKey(
 
   if (scope && !hasScope(row.scopes, scope)) {
     throw forbidden(`This API key is missing the '${scope}' scope`);
+  }
+
+  // Plan gate: the public API is a paid feature, and a lapsed account
+  // is read-only, so anything beyond a `:read` scope also needs a
+  // writable account. Throws PlanLimitError → 402 via toApiErrorResponse.
+  if (scope && !scope.endsWith(':read')) {
+    await assertFeature(row.account_id, 'api');
+  } else if (!(await hasFeature(row.account_id, 'api'))) {
+    throw new PlanLimitError(
+      { code: 'feature_not_in_plan', key: 'api' },
+      'The public API is not included in this workspace\'s plan',
+    );
   }
 
   touchLastUsed(row.id);

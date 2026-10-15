@@ -9,6 +9,8 @@
 // ============================================================
 
 import { requireApiKey } from '@/lib/auth/api-context';
+import { assertCountBelowLimit } from '@/lib/billing/server';
+import { findExistingContact } from '@/lib/contacts/dedupe';
 import { ok, okList, fail, toApiErrorResponse } from '@/lib/api/v1/respond';
 import {
   parseListParams,
@@ -108,6 +110,12 @@ export async function POST(request: Request) {
     const phone = typeof body.phone === 'string' ? body.phone.trim() : '';
     if (!phone) {
       return fail('bad_request', "'phone' is required", 400);
+    }
+
+    // Plan gate: only a NEW contact counts against the limit, so an
+    // integration upserting existing contacts keeps working at the cap.
+    if (!(await findExistingContact(ctx.supabase, ctx.accountId, phone))) {
+      await assertCountBelowLimit(ctx.accountId, 'contacts', 'contacts', ctx.supabase);
     }
 
     const auditUserId = await resolveAuditUserId(ctx.supabase, ctx.accountId);

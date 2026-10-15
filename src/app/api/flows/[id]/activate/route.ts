@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { requireRole, toErrorResponse } from '@/lib/auth/account'
+import { assertFeature } from '@/lib/billing/server'
 import { supabaseAdmin } from '@/lib/flows/admin-client'
 import { validateFlowForActivation } from '@/lib/flows/validate'
 import { getT } from '@/lib/i18n/translate'
@@ -32,7 +33,8 @@ export async function POST(
   // below bypasses RLS, so enforce the role here (a viewer passes the
   // membership-only ownership check).
   try {
-    await requireRole('agent')
+    const { accountId: planAccountId } = await requireRole('agent')
+    await assertFeature(planAccountId, 'flows')
   } catch (err) {
     return toErrorResponse(err)
   }

@@ -14,6 +14,13 @@
 export type ColorUtility = "bg" | "stroke" | "fill" | "text"
 
 export const chartColors = {
+  // Local addition: follows the active accent theme (--primary).
+  primary: {
+    bg: "bg-primary",
+    stroke: "stroke-primary",
+    fill: "fill-primary",
+    text: "text-primary",
+  },
   blue: {
     bg: "bg-blue-500",
     stroke: "stroke-blue-500",

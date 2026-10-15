@@ -4,6 +4,8 @@ import {
   requireRole,
   toErrorResponse,
 } from '@/lib/auth/account'
+import { assertFeature } from '@/lib/billing/server'
+import { assertNotDemo } from '@/lib/demo/server'
 import { checkRateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit'
 import { encrypt, decrypt } from '@/lib/whatsapp/encryption'
 import { validateAiCredentials } from '@/lib/ai/validate'
@@ -74,6 +76,8 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const { supabase, accountId, userId } = await requireRole('admin')
+    await assertNotDemo(accountId)
+    await assertFeature(accountId, 'ai')
 
     const limit = checkRateLimit(`ai-config:${userId}`, RATE_LIMITS.adminAction)
     if (!limit.success) return rateLimitResponse(limit)
@@ -283,6 +287,7 @@ export async function POST(request: Request) {
 export async function DELETE() {
   try {
     const { supabase, accountId } = await requireRole('admin')
+    await assertNotDemo(accountId)
     const { error } = await supabase
       .from('ai_configs')
       .delete()

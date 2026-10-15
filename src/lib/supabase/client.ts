@@ -1,5 +1,6 @@
 import { createBrowserClient } from '@supabase/ssr'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { planLimitAwareFetch } from '@/lib/billing/plan-limit-events'
 
 // Singleton instance — one client shared across the whole browser session.
 // Creating multiple clients causes auth-lock contention ("Lock was released
@@ -11,7 +12,10 @@ export function createClient() {
 
   browserClient = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    // Reports plan-limit / read-only failures to <BillingProvider>,
+    // which opens the upgrade dialog. Pass-through otherwise.
+    { global: { fetch: planLimitAwareFetch } }
   )
 
   return browserClient
