@@ -74,25 +74,31 @@ export async function POST(request: Request) {
 
     // The plan comes from what THIS account started at checkout, never
     // from the request body.
+    const valid = subscriptionId
+      ? verifySubscriptionPaymentSignature(creds.keySecret, { subscriptionId, paymentId, signature })
+      : verifyOrderPaymentSignature(creds.keySecret, { orderId: orderId!, paymentId, signature });
+    if (!valid) {
+      return NextResponse.json({ error: t('invalidSignature') }, { status: 400 });
+    }
+
     const { data: sub } = await db
       .from('subscriptions')
-      .select('pending_plan_code, pending_interval, pending_provider_ref')
+      .select('pending_plan_code, pending_interval, pending_provider_ref, provider_subscription_id')
       .eq('account_id', ctx.accountId)
       .maybeSingle();
     const ref = subscriptionId ?? orderId;
     if (!sub?.pending_plan_code || sub.pending_provider_ref !== ref) {
+      // The webhook often lands before the browser callback and has
+      // already activated this exact payment (clearing the pending
+      // fields) — that's success, not a conflict.
+      const appliedRef = subscriptionId ?? `order:${orderId}`;
+      if (sub?.provider_subscription_id === appliedRef) {
+        return NextResponse.json({ ok: true, already_applied: true });
+      }
       return NextResponse.json({ error: t('paymentNotPending') }, { status: 409 });
     }
 
     if (subscriptionId) {
-      const valid = verifySubscriptionPaymentSignature(creds.keySecret, {
-        subscriptionId,
-        paymentId,
-        signature,
-      });
-      if (!valid) {
-        return NextResponse.json({ error: t('invalidSignature') }, { status: 400 });
-      }
       const remote = await fetchSubscription(creds, subscriptionId);
       await activateRecurring(db, {
         accountId: ctx.accountId,
@@ -104,10 +110,6 @@ export async function POST(request: Request) {
           new Date(Date.now() + 31 * 86_400_000).toISOString(),
       });
     } else if (orderId) {
-      const valid = verifyOrderPaymentSignature(creds.keySecret, { orderId, paymentId, signature });
-      if (!valid) {
-        return NextResponse.json({ error: t('invalidSignature') }, { status: 400 });
-      }
       await activateAnnual(db, {
         accountId: ctx.accountId,
         planCode: sub.pending_plan_code,
