@@ -37,14 +37,14 @@ export function ProductPreview({ className }: { className?: string }) {
   ];
 
   return (
-    <div aria-hidden className={cn("min-w-0 rounded-2xl border border-border bg-card/80 p-2 shadow-2xl shadow-primary/10 backdrop-blur", className)}>
+    <div aria-hidden className={cn("min-w-0 rounded-xl border border-border bg-card p-1.5 shadow-[0_24px_60px_-24px_oklch(0.2_0.02_260/0.25)]", className)}>
       <div className="flex items-center gap-1.5 px-2 pb-2 pt-1">
-        <span className="size-2.5 rounded-full bg-red-400/70" />
-        <span className="size-2.5 rounded-full bg-amber-400/70" />
-        <span className="size-2.5 rounded-full bg-emerald-400/70" />
+        <span className="size-2.5 rounded-full bg-border" />
+        <span className="size-2.5 rounded-full bg-border" />
+        <span className="size-2.5 rounded-full bg-border" />
         <span className="mx-auto hidden rounded-md bg-muted px-16 py-0.5 text-[10px] text-muted-foreground sm:block">app / inbox</span>
       </div>
-      <div className="grid overflow-hidden rounded-xl border border-border bg-background text-left md:grid-cols-[150px_240px_1fr] lg:grid-cols-[160px_260px_1fr_220px]">
+      <div className="grid grid-cols-1 overflow-hidden rounded-lg border border-border bg-background text-left md:grid-cols-[150px_240px_1fr] lg:grid-cols-[160px_260px_1fr_220px]">
         {/* Sidebar */}
         <div className="hidden flex-col gap-0.5 border-r border-border bg-sidebar p-2 md:flex">
           {nav.map(({ icon: Icon, label, active }) => (
@@ -85,20 +85,20 @@ export function ProductPreview({ className }: { className?: string }) {
           ))}
         </div>
         {/* Conversation */}
-        <div className="flex min-h-[300px] flex-col gap-2 bg-muted/30 p-4 text-[12px]">
+        <div className="flex min-h-[300px] min-w-0 flex-col gap-2 bg-muted/30 p-4 text-[12px]">
           <div className="mx-auto rounded-full bg-background px-2.5 py-0.5 text-[10px] text-muted-foreground">Today</div>
           <p className="max-w-[80%] rounded-xl rounded-tl-sm bg-background px-3 py-2 shadow-sm">
             Hi! Is the blue silk saree back in stock?
           </p>
           <p className="ml-auto max-w-[80%] rounded-xl rounded-tr-sm bg-primary px-3 py-2 text-primary-foreground">
-            Yes, it arrived this morning 👋 Shall I reserve one for you?
+            Yes, it arrived this morning. Shall I reserve one for you?
           </p>
           <p className="max-w-[80%] rounded-xl rounded-tl-sm bg-background px-3 py-2 shadow-sm">
             Yes please! Do you deliver to Pune by Friday?
           </p>
           <div className="mt-auto flex items-center gap-2 rounded-xl border border-primary/30 bg-background px-3 py-2 text-primary">
             <Bot className="size-3.5 shrink-0" />
-            <span className="truncate">AI draft: “Yes — order by Wednesday for Friday delivery.”</span>
+            <span className="min-w-0 truncate">AI draft: “Yes — order by Wednesday for Friday delivery.”</span>
             <span className="ml-auto shrink-0 rounded-md bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground">Use</span>
           </div>
         </div>

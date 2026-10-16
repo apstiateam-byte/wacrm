@@ -107,7 +107,7 @@ export function ContactForm() {
 
   if (status.kind === "sent") {
     return (
-      <div role="status" className="flex flex-col items-center rounded-2xl border border-border bg-card p-10 text-center">
+      <div role="status" className="flex flex-col items-center rounded-xl border border-border bg-card p-10 text-center">
         <CheckCircle2 className="size-10 text-primary" />
         <h3 className="mt-4 text-xl font-semibold">Thanks — message sent!</h3>
         <p className="mt-2 max-w-sm text-sm text-muted-foreground">
@@ -132,7 +132,7 @@ export function ContactForm() {
     ) : null;
 
   return (
-    <form onSubmit={submit} noValidate className="grid gap-4 rounded-2xl border border-border bg-card p-6 sm:grid-cols-2 sm:p-8">
+    <form onSubmit={submit} noValidate className="grid gap-4 rounded-xl border border-border bg-background p-6 sm:grid-cols-2 sm:p-8">
       <div className="space-y-1.5">
         <Label htmlFor="cf-name">Name *</Label>
         <Input id="cf-name" autoComplete="name" value={fields.name} onChange={(e) => set("name")(e.target.value)} {...field("name")} />

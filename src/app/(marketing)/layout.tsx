@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-import { buttonVariants } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/server";
 import { announcement, brand } from "@/content/marketing";
 import { LogoMark } from "@/components/brand/logo";
@@ -21,8 +19,7 @@ export const metadata: Metadata = {
 };
 
 const NAV = [
-  { href: "/#features", label: "Features" },
-  { href: "/#about", label: "About" },
+  { href: "/#features", label: "Product" },
   { href: "/#pricing", label: "Pricing" },
   { href: "/demo", label: "Demo" },
   { href: "/#contact", label: "Contact" },
@@ -56,8 +53,10 @@ const FOOTER = [
   },
 ];
 
-/** Pill call-to-action, dark on light (and light on dark). */
-const pillDark = "inline-flex h-9 items-center gap-1.5 rounded-full bg-foreground px-4 text-sm font-medium text-background transition-opacity hover:opacity-90";
+const primaryBtn =
+  "inline-flex h-9 items-center gap-1.5 rounded-lg bg-primary px-3.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary-hover active:translate-y-px";
+const ghostBtn =
+  "inline-flex h-9 items-center rounded-lg px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground";
 
 export default async function MarketingLayout({ children }: { children: React.ReactNode }) {
   // Signed-in visitors get "Open dashboard" instead of sign-up CTAs.
@@ -72,82 +71,97 @@ export default async function MarketingLayout({ children }: { children: React.Re
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      {/* Announcement bar */}
-      <div className="bg-foreground text-background">
-        <div className="mx-auto flex max-w-6xl items-center justify-center gap-2 px-4 py-2 text-center text-xs sm:text-sm">
-          <span aria-hidden>✨</span>
-          <span className="truncate">{announcement.text}</span>
-          {announcement.href ? (
-            <Link href={announcement.href} className="inline-flex shrink-0 items-center gap-1 font-medium text-primary hover:underline">
-              {announcement.cta} <ArrowRight className="size-3" />
-            </Link>
-          ) : null}
-        </div>
-      </div>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-lg focus:bg-card focus:px-3 focus:py-2 focus:text-sm focus:shadow"
+      >
+        Skip to content
+      </a>
 
-      <header className="sticky top-0 z-30 border-b border-border/60 bg-background/80 backdrop-blur">
-        <div className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto] items-center gap-6 px-4 sm:px-6 md:grid-cols-[1fr_auto_1fr]">
-          <Link href="/" className="flex items-center gap-2 font-semibold">
-            <LogoMark size={32} />
+      {/* Announcement bar */}
+      {announcement.text ? (
+        <div className="border-b border-border bg-card">
+          <div className="mx-auto flex max-w-6xl items-center justify-center gap-2 px-4 py-2 text-center text-xs sm:text-sm">
+            <span className="rounded-md bg-primary-soft px-1.5 py-0.5 text-[11px] font-semibold text-primary">New</span>
+            <span className="truncate text-muted-foreground">{announcement.text}</span>
+            {announcement.href ? (
+              <Link href={announcement.href} className="inline-flex shrink-0 items-center gap-1 font-medium text-foreground hover:text-primary">
+                {announcement.cta} <ArrowRight className="size-3" />
+              </Link>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
+
+      <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur-md">
+        <div className="mx-auto flex h-16 max-w-6xl items-center gap-8 px-4 sm:px-6">
+          <Link href="/" className="flex shrink-0 items-center gap-2 text-[15px] font-semibold tracking-tight">
+            <LogoMark size={28} />
             {brand.name}
           </Link>
-          <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex" aria-label="Main">
+          <nav className="hidden items-center gap-1 text-sm md:flex" aria-label="Main">
             {NAV.map((item) => (
-              <Link key={item.href} href={item.href} className="transition-colors hover:text-foreground">
+              <Link
+                key={item.href}
+                href={item.href}
+                className="rounded-md px-2.5 py-1.5 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              >
                 {item.label}
               </Link>
             ))}
           </nav>
-          <div className="flex items-center justify-end gap-2">
+          <div className="ml-auto flex items-center gap-1.5">
             {signedIn ? (
-              <Link href="/dashboard" className={pillDark}>
+              <Link href="/dashboard" className={primaryBtn}>
                 Open dashboard <ArrowRight className="size-3.5" />
               </Link>
             ) : (
               <>
-                <Link href="/login" className={cn(buttonVariants({ variant: "ghost" }), "h-9 rounded-full px-4")}>
+                <Link href="/login" className={ghostBtn}>
                   Log in
                 </Link>
-                <Link href="/signup" className={pillDark}>
+                <Link href="/signup" className={primaryBtn}>
                   Start free trial
                 </Link>
               </>
             )}
           </div>
         </div>
-        <nav className="flex gap-5 overflow-x-auto px-4 pb-2.5 text-sm text-muted-foreground md:hidden" aria-label="Main mobile">
+        <nav className="flex gap-1 overflow-x-auto px-3 pb-2 text-sm md:hidden" aria-label="Main mobile">
           {NAV.map((item) => (
-            <Link key={item.href} href={item.href} className="shrink-0 hover:text-foreground">
+            <Link key={item.href} href={item.href} className="shrink-0 rounded-md px-2.5 py-1 text-muted-foreground hover:bg-muted hover:text-foreground">
               {item.label}
             </Link>
           ))}
         </nav>
       </header>
 
-      <main className="flex-1">{children}</main>
+      <main id="main" className="flex-1">
+        {children}
+      </main>
 
-      <footer className="border-t border-border/60 bg-card/40">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 text-sm sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <footer className="border-t border-border">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 text-sm sm:px-6 md:grid-cols-[1.6fr_1fr_1fr_1fr]">
           <div>
-            <Link href="/" className="flex items-center gap-2 font-semibold">
-              <LogoMark size={32} />
+            <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
+              <LogoMark size={26} />
               {brand.name}
             </Link>
             <p className="mt-4 max-w-xs text-muted-foreground">
-              WhatsApp CRM for growing businesses. Built on the official WhatsApp Business Platform.
+              WhatsApp CRM for growing businesses, built on the official WhatsApp Business Platform.
             </p>
-            <a href={`mailto:${brand.supportEmail}`} className="mt-4 inline-block text-muted-foreground hover:text-foreground">
+            <a href={`mailto:${brand.supportEmail}`} className="mt-4 inline-block text-foreground hover:text-primary">
               {brand.supportEmail}
             </a>
             {brand.supportPhone ? <p className="mt-1 text-muted-foreground">{brand.supportPhone}</p> : null}
           </div>
           {FOOTER.map((col) => (
             <div key={col.title}>
-              <p className="font-medium text-foreground">{col.title}</p>
-              <ul className="mt-3 space-y-2 text-muted-foreground">
+              <p className="text-xs font-medium text-muted-foreground">{col.title}</p>
+              <ul className="mt-3 space-y-2">
                 {col.links.map((l) => (
                   <li key={l.href + l.label}>
-                    <Link href={l.href} className="hover:text-foreground">
+                    <Link href={l.href} className="text-foreground/80 transition-colors hover:text-foreground">
                       {l.label}
                     </Link>
                   </li>
@@ -156,10 +170,10 @@ export default async function MarketingLayout({ children }: { children: React.Re
             </div>
           ))}
         </div>
-        <div className="border-t border-border/60">
+        <div className="border-t border-border">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:px-6">
             <p>
-              © {new Date().getFullYear()} {brand.legalEntity}. All rights reserved.
+              © {new Date().getFullYear()} {brand.legalEntity.trim()}. All rights reserved.
             </p>
             <p>WhatsApp is a trademark of Meta Platforms, Inc.</p>
           </div>

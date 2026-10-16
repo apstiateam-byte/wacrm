@@ -217,7 +217,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
       <aside
         className={cn(
           // Mobile: fixed drawer that slides in from the left.
-          "fixed inset-y-0 left-0 z-40 flex h-full w-64 flex-col border-r border-border bg-card",
+          "fixed inset-y-0 left-0 z-40 flex h-full w-64 flex-col border-r border-border bg-sidebar",
           "transition-transform duration-200 ease-out will-change-transform",
           open ? "translate-x-0" : "-translate-x-full",
           // Desktop: static, always visible — reset all the mobile framing.
@@ -252,7 +252,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
           {group !== "overview" ? (
             <p
               className={cn(
-                "px-3 pb-1 text-[11px] font-semibold tracking-[0.08em] text-muted-foreground/80 uppercase",
+                "px-3 pb-1 text-xs font-medium text-muted-foreground/80",
                 label,
               )}
             >
@@ -285,8 +285,8 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
                       "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors lg:py-2",
                       collapsed && "lg:justify-center lg:px-0",
                       isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                        ? "bg-sidebar-accent text-foreground [&>svg:first-child]:text-primary"
+                        : "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-foreground",
                     )}
                   >
                     <item.icon className="h-4 w-4 shrink-0" />
@@ -349,8 +349,8 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
                       "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors lg:py-2",
                       collapsed && "lg:justify-center lg:px-0",
                       isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                        ? "bg-sidebar-accent text-foreground [&>svg:first-child]:text-primary"
+                        : "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-foreground",
                     )}
                   >
                     <item.icon className="h-4 w-4 shrink-0" />

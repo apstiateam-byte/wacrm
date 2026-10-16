@@ -16,14 +16,14 @@ export default function DemoPage() {
   return (
     <div className="mx-auto max-w-5xl px-4 py-16 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <h1 className="text-4xl font-bold tracking-tight">See {brand.name} in action</h1>
+        <h1 className="font-display text-4xl sm:text-5xl">See {brand.name} in action</h1>
         <p className="mt-4 text-lg text-muted-foreground">
           Click around a real workspace filled with sample chats, contacts and deals — or let us walk you through it.
         </p>
       </div>
 
       <div className="mt-12 grid gap-6 md:grid-cols-2">
-        <div className="flex flex-col rounded-2xl border border-border bg-card p-6">
+        <div className="flex flex-col rounded-xl border border-border bg-card p-6">
           <MousePointerClick className="size-6 text-primary" />
           <h2 className="mt-4 text-xl font-semibold">Try the live demo</h2>
           <p className="mt-2 flex-1 text-sm text-muted-foreground">
@@ -39,7 +39,7 @@ export default function DemoPage() {
           )}
         </div>
 
-        <div className="flex flex-col rounded-2xl border border-border bg-card p-6">
+        <div className="flex flex-col rounded-xl border border-border bg-card p-6">
           <CalendarDays className="size-6 text-primary" />
           <h2 className="mt-4 text-xl font-semibold">Book a guided demo</h2>
           <p className="mt-2 flex-1 text-sm text-muted-foreground">

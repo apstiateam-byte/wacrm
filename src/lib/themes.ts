@@ -14,6 +14,7 @@
  */
 
 export const THEME_IDS = [
+  "jade",
   "clay",
   "violet",
   "emerald",
@@ -24,11 +25,11 @@ export const THEME_IDS = [
 
 export type ThemeId = (typeof THEME_IDS)[number];
 
-export const DEFAULT_THEME: ThemeId = "clay";
+export const DEFAULT_THEME: ThemeId = "jade";
 
-// `.v2` since the warm redesign: earlier saved picks (violet / dark)
-// would otherwise pin returning visitors to the old look.
-export const STORAGE_KEY = "wacrm.theme.v2";
+// `.v3` since the Modern SaaS redesign: earlier saved picks (clay from
+// the warm redesign) would otherwise pin returning visitors to the old look.
+export const STORAGE_KEY = "wacrm.theme.v3";
 
 /**
  * MODE — the light/dark dimension, orthogonal to the accent theme.
@@ -48,7 +49,7 @@ export type Mode = (typeof MODES)[number];
 
 export const DEFAULT_MODE: Mode = "light";
 
-export const MODE_STORAGE_KEY = "wacrm.mode.v2";
+export const MODE_STORAGE_KEY = "wacrm.mode.v3";
 
 export function isMode(value: unknown): value is Mode {
   return (
@@ -71,9 +72,15 @@ export interface ThemeMeta {
 
 export const THEMES: ReadonlyArray<ThemeMeta> = [
   {
+    id: "jade",
+    name: "Jade",
+    tagline: "The default — a calm green-teal accent.",
+    swatch: "oklch(0.57 0.13 163)",
+  },
+  {
     id: "clay",
     name: "Clay",
-    tagline: "The default — warm terracotta on paper.",
+    tagline: "Warm terracotta.",
     swatch: "oklch(0.6 0.135 42)",
   },
   {

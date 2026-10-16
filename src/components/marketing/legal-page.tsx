@@ -17,7 +17,7 @@ export function LegalPage({
 }) {
   return (
     <article className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-      <h1 className="text-3xl font-bold tracking-tight">{title}</h1>
+      <h1 className="font-display text-3xl sm:text-4xl">{title}</h1>
       <p className="mt-2 text-sm text-muted-foreground">Last updated: {updated}</p>
       {intro ? <p className="mt-6 text-muted-foreground">{intro}</p> : null}
       {sections.map((s, i) => (

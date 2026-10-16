@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-serif);
+  --font-heading: var(--font-sans);
   --font-serif: var(--font-serif);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -93,67 +93,82 @@
 
 :root,
 html[data-mode="light"] {
-  --background: oklch(0.972 0.008 85);
-  --foreground: oklch(0.24 0.012 65);
-  --card: oklch(0.99 0.004 85);
-  --card-2: oklch(0.958 0.009 85);
-  --card-foreground: oklch(0.24 0.012 65);
-  --popover: oklch(0.99 0.004 85);
-  --popover-foreground: oklch(0.24 0.012 65);
-  --secondary: oklch(0.94 0.01 85);
-  --secondary-foreground: oklch(0.28 0.012 65);
-  --muted: oklch(0.94 0.01 85);
-  --muted-foreground: oklch(0.5 0.016 70);
-  --accent: oklch(0.935 0.012 80);
-  --accent-foreground: oklch(0.28 0.012 65);
-  --destructive: oklch(0.55 0.2 28);
-  --border: oklch(0.895 0.012 85);
-  --input: oklch(0.88 0.013 85);
-  --chart-2: oklch(0.62 0.07 150);
-  --chart-3: oklch(0.7 0.06 85);
-  --chart-4: oklch(0.78 0.04 70);
-  --chart-5: oklch(0.86 0.025 80);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.955 0.01 85);
-  --sidebar-foreground: oklch(0.26 0.012 65);
-  --sidebar-accent: oklch(0.925 0.013 80);
-  --sidebar-accent-foreground: oklch(0.24 0.012 65);
-  --sidebar-border: oklch(0.895 0.012 85);
+  --background: oklch(0.985 0.002 250);
+  --foreground: oklch(0.205 0.012 260);
+  --card: oklch(1 0 0);
+  --card-2: oklch(0.967 0.003 250);
+  --card-foreground: oklch(0.205 0.012 260);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.205 0.012 260);
+  --secondary: oklch(0.955 0.004 250);
+  --secondary-foreground: oklch(0.24 0.012 260);
+  --muted: oklch(0.962 0.003 250);
+  --muted-foreground: oklch(0.52 0.014 260);
+  --accent: oklch(0.955 0.004 250);
+  --accent-foreground: oklch(0.24 0.012 260);
+  --destructive: oklch(0.577 0.215 27);
+  --border: oklch(0.918 0.004 260);
+  --input: oklch(0.9 0.005 260);
+  --chart-2: oklch(0.62 0.12 230);
+  --chart-3: oklch(0.72 0.13 80);
+  --chart-4: oklch(0.66 0.09 300);
+  --chart-5: oklch(0.8 0.02 260);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.975 0.003 250);
+  --sidebar-foreground: oklch(0.25 0.012 260);
+  --sidebar-accent: oklch(0.945 0.005 250);
+  --sidebar-accent-foreground: oklch(0.205 0.012 260);
+  --sidebar-border: oklch(0.918 0.004 260);
 }
 
 html[data-mode="dark"] {
-  --background: oklch(0.195 0.006 70);
-  --foreground: oklch(0.95 0.008 85);
-  --card: oklch(0.228 0.007 70);
-  --card-2: oklch(0.255 0.008 70);
-  --card-foreground: oklch(0.95 0.008 85);
-  --popover: oklch(0.228 0.007 70);
-  --popover-foreground: oklch(0.95 0.008 85);
-  --secondary: oklch(0.27 0.008 70);
-  --secondary-foreground: oklch(0.95 0.008 85);
-  --muted: oklch(0.27 0.008 70);
-  --muted-foreground: oklch(0.7 0.012 80);
-  --accent: oklch(0.28 0.009 70);
-  --accent-foreground: oklch(0.95 0.008 85);
-  --destructive: oklch(0.62 0.19 28);
-  --border: oklch(0.325 0.009 70);
-  --input: oklch(0.34 0.01 70);
-  --chart-2: oklch(0.66 0.08 150);
-  --chart-3: oklch(0.55 0.04 80);
-  --chart-4: oklch(0.45 0.03 70);
-  --chart-5: oklch(0.36 0.02 70);
-  --radius: 0.75rem;
-  --sidebar: oklch(0.17 0.006 70);
-  --sidebar-foreground: oklch(0.93 0.008 85);
-  --sidebar-accent: oklch(0.255 0.008 70);
-  --sidebar-accent-foreground: oklch(0.95 0.008 85);
-  --sidebar-border: oklch(0.3 0.009 70);
+  --background: oklch(0.155 0.006 260);
+  --foreground: oklch(0.97 0.003 250);
+  --card: oklch(0.19 0.007 260);
+  --card-2: oklch(0.225 0.008 260);
+  --card-foreground: oklch(0.97 0.003 250);
+  --popover: oklch(0.2 0.007 260);
+  --popover-foreground: oklch(0.97 0.003 250);
+  --secondary: oklch(0.24 0.008 260);
+  --secondary-foreground: oklch(0.97 0.003 250);
+  --muted: oklch(0.225 0.008 260);
+  --muted-foreground: oklch(0.71 0.012 260);
+  --accent: oklch(0.25 0.008 260);
+  --accent-foreground: oklch(0.97 0.003 250);
+  --destructive: oklch(0.65 0.2 25);
+  --border: oklch(0.275 0.008 260);
+  --input: oklch(0.31 0.009 260);
+  --chart-2: oklch(0.68 0.12 230);
+  --chart-3: oklch(0.76 0.13 80);
+  --chart-4: oklch(0.7 0.1 300);
+  --chart-5: oklch(0.45 0.02 260);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.135 0.006 260);
+  --sidebar-foreground: oklch(0.93 0.004 250);
+  --sidebar-accent: oklch(0.225 0.008 260);
+  --sidebar-accent-foreground: oklch(0.97 0.003 250);
+  --sidebar-border: oklch(0.255 0.008 260);
 }
 
 /* ---- ACCENT: primary color ---- */
 
-/* Clay — the default: a warm terracotta that sits on paper and charcoal. */
+/* Jade — the default since the Modern SaaS redesign: a confident
+   green-teal that nods to WhatsApp without shouting. */
 :root,
+html[data-theme="jade"] {
+  --primary: oklch(0.57 0.13 163);
+  --primary-foreground: oklch(0.99 0.004 163);
+  --primary-hover: oklch(0.52 0.13 163);
+  --primary-soft: oklch(0.57 0.13 163 / 0.1);
+  --primary-soft-2: oklch(0.57 0.13 163 / 0.18);
+  --ring: oklch(0.57 0.13 163);
+  --chart-1: oklch(0.57 0.13 163);
+  --sidebar-primary: oklch(0.57 0.13 163);
+  --sidebar-primary-foreground: oklch(0.99 0.004 163);
+  --sidebar-ring: oklch(0.57 0.13 163);
+}
+
+/* Clay — warm terracotta (the previous default). */
 html[data-theme="clay"] {
   --primary: oklch(0.6 0.135 42);
   --primary-foreground: oklch(0.99 0.004 85);
@@ -248,26 +263,41 @@ html[data-theme="rose"] {
   }
 }
 /* ============================================================
- * Editorial headings.
+ * Headings — Modern SaaS (see DESIGN.md).
  *
- * Page and section titles (h1/h2) use the serif at a medium weight —
- * the warm, book-like voice of the redesign. Deliberately UNLAYERED so
- * it wins over the `font-bold` / `tracking-tight` utilities that
- * existing pages put on their headings, restyling every screen
- * without touching each one. Card titles (h3+) stay in the sans.
+ * Page and section titles (h1/h2) use Geist at semibold with tight
+ * tracking. Deliberately UNLAYERED so it wins over the `font-bold` /
+ * `tracking-tight` utilities existing pages put on their headings,
+ * restyling every screen without touching each one.
  * ============================================================ */
 h1,
 h2,
 .font-heading {
-  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
-  font-weight: 500;
-  letter-spacing: -0.012em;
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.022em;
 }
 
-/* Soft, warm elevation for cards (layered, so a card's own shadow-*
+/* Marketing display headlines: larger and tighter. */
+.font-display {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.038em;
+  line-height: 1.04;
+}
+
+/* Quiet, neutral elevation for cards (layered, so a card's own shadow-*
    utility still wins). */
 @layer base {
   [data-slot="card"] {
-    box-shadow: 0 1px 2px oklch(0.3 0.02 60 / 0.05), 0 1px 1px oklch(0.3 0.02 60 / 0.03);
+    box-shadow: 0 1px 2px oklch(0.2 0.01 260 / 0.04);
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 }

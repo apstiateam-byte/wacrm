@@ -5,12 +5,12 @@ import {
   Bot,
   Braces,
   Check,
+  ChevronDown,
   GitBranch,
   Mail,
   MessageSquare,
   Phone,
   Radio,
-  Sparkles,
   Users,
   Workflow,
   Zap,
@@ -73,15 +73,28 @@ async function loadPlans(): Promise<{ plans: Plan[]; tax: TaxSettings }> {
   }
 }
 
-/** Pill buttons, as on the reference design. */
-const pill = "rounded-full h-11 px-6 text-base";
+/** Large call-to-action buttons. */
+const ctaLg = "h-11 rounded-lg px-5 text-[15px]";
 
-/** Small eyebrow + serif heading + subcopy, centred. */
-function SectionHead({ eyebrow, title, subtitle }: { eyebrow: string; title: string; subtitle?: string }) {
+/** Subtle grid texture used behind the hero and the closing CTA. */
+const gridTexture =
+  "pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-[size:56px_56px]";
+
+function SectionHead({
+  eyebrow,
+  title,
+  subtitle,
+  align = "left",
+}: {
+  eyebrow: string;
+  title: string;
+  subtitle?: string;
+  align?: "left" | "center";
+}) {
   return (
-    <div className="mx-auto max-w-2xl text-center">
+    <div className={cn("max-w-2xl", align === "center" && "mx-auto text-center")}>
       <p className="text-sm font-medium text-primary">{eyebrow}</p>
-      <h2 className="mt-2 text-3xl tracking-tight text-balance sm:text-5xl">{title}</h2>
+      <h2 className="font-display mt-3 text-3xl text-balance sm:text-[2.6rem]">{title}</h2>
       {subtitle ? <p className="mt-4 text-pretty text-muted-foreground sm:text-lg">{subtitle}</p> : null}
     </div>
   );
@@ -93,53 +106,63 @@ export default async function LandingPage() {
   const live = demoEnabled();
   const { plans, tax } = await loadPlans();
 
-  // Bento layout: one wide and one tall card first, then regular ones.
-  const [f0, f1, f2, f3, ...rest] = features;
+  // The GST answer follows the platform's actual pricing setting.
+  const faqItems = faqs.map((f) =>
+    f.q === "Do prices include GST?"
+      ? {
+          ...f,
+          a: tax.pricesIncludeGst
+            ? `Yes. Prices shown include ${tax.gstPercent}% GST, and a GST invoice is issued for every payment. Add your GSTIN to claim input tax credit.`
+            : `Prices are shown excluding GST. ${tax.gstPercent}% GST is added at checkout — the total is shown before you pay — and a GST invoice is issued for every payment. Add your GSTIN to claim input tax credit.`,
+        }
+      : f,
+  );
 
   return (
     <>
-      {/* ================= Hero (centred) ================= */}
-      <section className="relative overflow-hidden">
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 -top-24 h-[520px] bg-[radial-gradient(ellipse_at_top,var(--color-primary)_0%,transparent_62%)] opacity-[0.14]"
-        />
-        <div className="relative mx-auto max-w-6xl px-4 pt-16 pb-10 text-center sm:px-6 sm:pt-24">
+      {/* ================= Hero ================= */}
+      <section className="relative overflow-hidden border-b border-border">
+        <div aria-hidden className={cn(gridTexture, "opacity-60 [mask-image:radial-gradient(ellipse_70%_60%_at_30%_0%,black,transparent)]")} />
+        <div className="relative mx-auto max-w-6xl px-4 pt-16 pb-14 sm:px-6 sm:pt-24">
           <Link
             href="/#product"
-            className="inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm hover:text-foreground"
+            className="inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-card py-1 pr-3 pl-1 text-xs font-medium text-muted-foreground shadow-xs transition-colors hover:text-foreground"
           >
-            <Sparkles className="size-3.5 shrink-0 text-primary" />
+            <span className="rounded-full bg-primary-soft px-2 py-0.5 text-primary">Official</span>
             <span className="truncate">{hero.eyebrow}</span>
             <ArrowRight className="size-3 shrink-0" />
           </Link>
-          <h1 className="mx-auto mt-6 max-w-4xl text-5xl leading-[1.05] tracking-tight text-balance sm:text-6xl lg:text-7xl">
-            Sell, support and grow on <span className="text-primary italic">WhatsApp</span>
+          <h1 className="font-display mt-6 max-w-4xl text-[2.75rem] text-balance sm:text-6xl lg:text-[4.4rem]">
+            Run WhatsApp like a real sales and support team
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-pretty text-muted-foreground">{hero.subtitle}</p>
-          <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <Link href="/signup" className={cn(buttonVariants({ size: "lg" }), pill)}>
+          <p className="mt-6 max-w-2xl text-lg text-pretty text-muted-foreground">{hero.subtitle}</p>
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Link href="/signup" className={cn(buttonVariants({ size: "lg" }), ctaLg)}>
               {hero.primaryCta} <ArrowRight className="size-4" />
             </Link>
             <SecondaryCta live={live} />
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">{hero.note}</p>
+          <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+            {hero.note.split("·").map((item) => (
+              <li key={item} className="flex items-center gap-1.5">
+                <Check className="size-4 text-primary" /> {item.trim()}
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <div id="product" className="relative mx-auto max-w-6xl scroll-mt-24 px-4 pb-16 sm:px-6">
+        <div id="product" className="relative mx-auto max-w-6xl scroll-mt-24 px-4 pb-20 sm:px-6">
           <ProductPreview />
         </div>
       </section>
 
-      {/* ================= Works with ================= */}
-      <section className="border-y border-border/60 bg-card/40">
-        <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-          <p className="text-center text-xs font-medium tracking-[0.14em] text-muted-foreground uppercase">
-            Works with the tools you already use
-          </p>
-          <ul className="mt-5 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+      {/* ================= Built on ================= */}
+      <section className="border-b border-border">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-7 sm:px-6 md:flex-row md:items-center md:gap-10">
+          <p className="shrink-0 text-sm text-muted-foreground">Works with</p>
+          <ul className="flex flex-wrap items-center gap-x-7 gap-y-2">
             {integrations.map((name) => (
-              <li key={name} className="text-sm font-semibold text-foreground/70">
+              <li key={name} className="text-sm font-medium text-foreground/70">
                 {name}
               </li>
             ))}
@@ -147,95 +170,137 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* ================= Product tour (pill tabs) ================= */}
+      {/* ================= Product tour ================= */}
       <section id="features" className="mx-auto max-w-6xl scroll-mt-20 px-4 py-24 sm:px-6">
         <SectionHead
           eyebrow="Product"
           title="One workspace for every WhatsApp conversation"
-          subtitle="Marketing, sales and support in the same place — for your whole team."
+          subtitle="Marketing, sales and support share the same customer history — so nobody asks the customer twice."
         />
         <div className="mt-12">
           <FeatureTabs />
         </div>
       </section>
 
-      {/* ================= Bento grid ================= */}
-      <section className="mx-auto max-w-6xl px-4 pb-24 sm:px-6">
-        <SectionHead eyebrow="Features" title="Everything you need, nothing you don't" />
-        <div className="mt-12 grid auto-rows-[minmax(180px,auto)] gap-4 md:grid-cols-3">
-          <BentoCard feature={f0} className="md:col-span-2" big />
-          <BentoCard feature={f1} className="md:row-span-2" tall />
-          <BentoCard feature={f2} />
-          <BentoCard feature={f3} />
-          {/* Remaining rows alternate wide + small, small + wide, so no row
-              is left with a single orphan card. */}
-          {rest.map((f, i) => (
-            <BentoCard key={f.title} feature={f} className={i % 3 === 0 ? "md:col-span-2" : undefined} />
-          ))}
+      {/* ================= Spotlights (zig-zag) ================= */}
+      <section className="border-y border-border bg-card">
+        <div className="mx-auto max-w-6xl space-y-24 px-4 py-24 sm:px-6">
+          <Spotlight
+            eyebrow="Broadcasts"
+            title="Campaigns your customers actually read"
+            body="Send Meta-approved templates to opted-in audiences, personalise every message, and watch delivery, read and reply rates as they come in."
+            points={["Audiences by tag, field or CSV", "Scheduled sends", "Replies land straight in the shared inbox"]}
+            visual={<BroadcastPreview />}
+          />
+          <Spotlight
+            reverse
+            eyebrow="Automations & API"
+            title="The busywork runs itself"
+            body="Follow up on keywords, tag new leads, assign chats and branch on replies. Connect your store or ERP with a REST API and webhooks."
+            points={["Keyword, tag and new-contact triggers", "Waits, branches and assignment", "REST API, webhooks and an MCP server"]}
+            visual={
+              <div className="space-y-3">
+                <AutomationChain />
+                <ApiSnippet />
+              </div>
+            }
+          />
         </div>
       </section>
 
-      {/* ================= Stats ================= */}
-      <section className="border-y border-border/60 bg-card/40">
-        <div className="mx-auto grid max-w-6xl grid-cols-2 divide-border px-4 py-10 sm:px-6 lg:grid-cols-4 lg:divide-x">
-          {stats.map((s) => (
-            <div key={s.label} className="px-4 py-3 text-center">
-              <p className="font-heading text-4xl text-foreground">{s.value}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{s.label}</p>
+      {/* ================= Everything included ================= */}
+      <section className="mx-auto grid max-w-6xl gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[0.85fr_1.15fr]">
+        <div className="lg:sticky lg:top-28 lg:self-start">
+          <SectionHead
+            eyebrow="Included"
+            title="Everything a WhatsApp team needs"
+            subtitle="No bolt-ons for the basics. Every plan gets the inbox, contacts and broadcasts; higher plans add chatbots, AI and the API."
+          />
+          <Link href="/pricing" className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline">
+            Compare plans <ArrowRight className="size-4" />
+          </Link>
+        </div>
+        <dl className="grid gap-x-8 sm:grid-cols-2">
+          {features.map((f) => {
+            const Icon = ICONS[f.icon];
+            return (
+              <div key={f.title} className="border-t border-border py-6">
+                <dt className="flex items-center gap-2.5 font-medium">
+                  <Icon className="size-[18px] text-muted-foreground" strokeWidth={1.75} />
+                  {f.title}
+                </dt>
+                <dd className="mt-2 text-sm leading-relaxed text-muted-foreground">{f.body}</dd>
+              </div>
+            );
+          })}
+        </dl>
+      </section>
+
+      {/* ================= Facts ================= */}
+      <section className="border-y border-border">
+        <dl className="mx-auto grid max-w-6xl grid-cols-2 px-4 sm:px-6 lg:grid-cols-4">
+          {stats.map((s, i) => (
+            <div
+              key={s.label}
+              className={cn(
+                "border-border py-10 pr-4 sm:pr-6",
+                i % 2 === 1 ? "border-l pl-4 sm:pl-6" : "pl-0",
+                i >= 2 && "border-t lg:border-t-0",
+                i === 2 && "lg:border-l lg:pl-6",
+              )}
+            >
+              <dt className="sr-only">{s.label}</dt>
+              <dd className="font-display text-4xl tabular-nums">{s.value}</dd>
+              <dd className="mt-1.5 text-sm text-muted-foreground">{s.label}</dd>
             </div>
           ))}
-        </div>
+        </dl>
+      </section>
+
+      {/* ================= How it works ================= */}
+      <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
+        <SectionHead eyebrow="How it works" title="Live on WhatsApp in an afternoon" />
+        <ol className="mt-12 grid gap-8 md:grid-cols-3">
+          {steps.map((s, i) => (
+            <li key={s.title} className="border-t-2 border-border pt-5 first:border-primary">
+              <span className="font-mono text-sm text-muted-foreground">0{i + 1}</span>
+              <h3 className="mt-2 text-lg font-semibold tracking-tight">{s.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{s.body}</p>
+            </li>
+          ))}
+        </ol>
       </section>
 
       {/* ================= About ================= */}
-      <section id="about" className="scroll-mt-20">
-        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:items-start">
+      <section id="about" className="scroll-mt-20 border-t border-border bg-card">
+        <div className="mx-auto grid max-w-6xl gap-12 px-4 py-24 sm:px-6 lg:grid-cols-[1.1fr_1fr]">
           <div className="min-w-0">
             <p className="text-sm font-medium text-primary">{about.eyebrow}</p>
-            <h2 className="mt-2 text-3xl tracking-tight text-balance sm:text-5xl">{about.title}</h2>
+            <h2 className="font-display mt-3 text-3xl text-balance sm:text-[2.6rem]">{about.title}</h2>
             {about.paragraphs.map((p) => (
               <p key={p.slice(0, 32)} className="mt-5 text-pretty text-muted-foreground sm:text-lg">
                 {p}
               </p>
             ))}
           </div>
-          <ul className="grid gap-4 sm:grid-cols-2">
+          <ul className="grid content-start gap-x-8 sm:grid-cols-2">
             {about.values.map((v) => (
-              <li key={v.title} className="rounded-2xl border border-border bg-card p-5">
-                <span className="flex size-8 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <Check className="size-4" />
-                </span>
-                <h3 className="mt-3 font-semibold">{v.title}</h3>
-                <p className="mt-1.5 text-sm text-muted-foreground">{v.body}</p>
+              <li key={v.title} className="border-t border-border py-5">
+                <h3 className="flex items-center gap-2 font-medium">
+                  <Check className="size-4 text-primary" /> {v.title}
+                </h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{v.body}</p>
               </li>
             ))}
           </ul>
         </div>
       </section>
 
-      {/* ================= How it works ================= */}
-      <section className="border-y border-border/60 bg-card/40">
-        <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-          <SectionHead eyebrow="How it works" title="Live in three steps" />
-          <ol className="relative mt-14 grid gap-10 md:grid-cols-3 md:gap-6">
-            <div aria-hidden className="absolute top-5 right-[16%] left-[16%] hidden h-px bg-border md:block" />
-            {steps.map((s, i) => (
-              <li key={s.title} className="relative text-center">
-                <span className="relative mx-auto flex size-10 items-center justify-center rounded-full border border-primary/40 bg-background font-heading text-lg text-primary">
-                  {i + 1}
-                </span>
-                <h3 className="mt-5 font-semibold">{s.title}</h3>
-                <p className="mx-auto mt-2 max-w-xs text-sm text-muted-foreground">{s.body}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-
       {/* ================= Pricing ================= */}
-      <section id="pricing" className="scroll-mt-20 py-24">
+      <section id="pricing" className="scroll-mt-20 border-t border-border py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <SectionHead
+            align="center"
             eyebrow="Pricing"
             title="Simple plans that grow with you"
             subtitle="Start with a 14-day free trial of Growth. No card required — pick a plan when you are ready."
@@ -254,51 +319,51 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* ================= FAQ (two columns) ================= */}
-      <section className="mx-auto grid max-w-6xl gap-10 px-4 pb-24 sm:px-6 lg:grid-cols-[0.8fr_1.2fr]">
-        <div>
-          <p className="text-sm font-medium text-primary">FAQ</p>
-          <h2 className="mt-2 text-3xl tracking-tight sm:text-5xl">Questions, answered</h2>
-          <p className="mt-4 text-muted-foreground">
-            Can&apos;t find what you need?{" "}
-            <Link href="/#contact" className="text-primary underline-offset-4 hover:underline">
-              Talk to us
-            </Link>
-            .
-          </p>
-        </div>
-        <div className="divide-y divide-border rounded-2xl border border-border bg-card">
-          {faqs.map((f) => (
-            <details key={f.q} className="group p-5">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-medium">
-                {f.q}
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-transform group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="mt-3 text-sm text-muted-foreground">{f.a}</p>
-            </details>
-          ))}
+      {/* ================= FAQ ================= */}
+      <section className="border-t border-border">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-24 sm:px-6 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <p className="text-sm font-medium text-primary">FAQ</p>
+            <h2 className="font-display mt-3 text-3xl sm:text-[2.6rem]">Questions, answered</h2>
+            <p className="mt-4 text-muted-foreground">
+              Can&apos;t find what you need?{" "}
+              <Link href="/#contact" className="font-medium text-foreground underline-offset-4 hover:underline">
+                Talk to us
+              </Link>
+              .
+            </p>
+          </div>
+          <div className="border-b border-border">
+            {faqItems.map((f) => (
+              <details key={f.q} className="group border-t border-border">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-medium [&::-webkit-details-marker]:hidden">
+                  {f.q}
+                  <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
+                </summary>
+                <p className="-mt-1 pb-5 text-sm leading-relaxed text-muted-foreground">{f.a}</p>
+              </details>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ================= Contact ================= */}
-      <section id="contact" className="scroll-mt-20 border-t border-border/60 bg-card/40">
+      <section id="contact" className="scroll-mt-20 border-t border-border bg-card">
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-24 sm:px-6 lg:grid-cols-[0.8fr_1.2fr]">
           <div className="min-w-0">
             <p className="text-sm font-medium text-primary">{contactSection.eyebrow}</p>
-            <h2 className="mt-2 text-3xl tracking-tight sm:text-5xl">{contactSection.title}</h2>
+            <h2 className="font-display mt-3 text-3xl sm:text-[2.6rem]">{contactSection.title}</h2>
             <p className="mt-4 text-muted-foreground">{contactSection.subtitle}</p>
             <ul className="mt-8 space-y-3 text-sm">
-              <li className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="size-4 text-primary" />
-                <a href={`mailto:${brand.supportEmail}`} className="hover:text-foreground">
+              <li className="flex items-center gap-2.5">
+                <Mail className="size-4 text-muted-foreground" />
+                <a href={`mailto:${brand.supportEmail}`} className="font-medium hover:text-primary">
                   {brand.supportEmail}
                 </a>
               </li>
               {brand.supportPhone ? (
-                <li className="flex items-center gap-2 text-muted-foreground">
-                  <Phone className="size-4 text-primary" /> {brand.supportPhone}
+                <li className="flex items-center gap-2.5">
+                  <Phone className="size-4 text-muted-foreground" /> {brand.supportPhone}
                 </li>
               ) : null}
             </ul>
@@ -309,27 +374,18 @@ export default async function LandingPage() {
         </div>
       </section>
 
-      {/* ================= Closing CTA panel ================= */}
+      {/* ================= Closing CTA ================= */}
       <section className="mx-auto max-w-6xl px-4 py-24 sm:px-6">
-        <div className="relative overflow-hidden rounded-3xl bg-foreground px-6 py-16 text-center text-background sm:px-12">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,var(--color-primary)_0%,transparent_55%)] opacity-50"
-          />
-          <div className="relative">
-            <Sparkles className="mx-auto size-6 text-primary" />
-            <h2 className="mx-auto mt-4 max-w-2xl text-3xl tracking-tight text-balance sm:text-5xl">
-              Turn WhatsApp into your best sales channel
-            </h2>
-            <p className="mt-4 text-background/70">{hero.note}</p>
-            <div className="mt-8 flex flex-wrap justify-center gap-3">
-              <Link href="/signup" className={cn(buttonVariants({ size: "lg" }), pill)}>
+        <div className="relative overflow-hidden rounded-2xl border border-border bg-card px-6 py-16 sm:px-14">
+          <div aria-hidden className={cn(gridTexture, "opacity-50 [mask-image:radial-gradient(ellipse_60%_80%_at_100%_100%,black,transparent)]")} />
+          <div className="relative max-w-2xl">
+            <h2 className="font-display text-3xl text-balance sm:text-5xl">Turn WhatsApp into your best sales channel</h2>
+            <p className="mt-4 text-muted-foreground">{hero.note}</p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/signup" className={cn(buttonVariants({ size: "lg" }), ctaLg)}>
                 {hero.primaryCta} <ArrowRight className="size-4" />
               </Link>
-              <Link
-                href="/pricing"
-                className={cn(pill, "inline-flex items-center border border-background/25 font-medium text-background hover:bg-background/10")}
-              >
+              <Link href="/pricing" className={cn(buttonVariants({ variant: "outline", size: "lg" }), ctaLg)}>
                 View pricing
               </Link>
             </div>
@@ -340,122 +396,69 @@ export default async function LandingPage() {
   );
 }
 
-function BentoCard({
-  feature,
-  className,
-  big,
-  tall,
+function Spotlight({
+  eyebrow,
+  title,
+  body,
+  points,
+  visual,
+  reverse = false,
 }: {
-  feature: (typeof features)[number];
-  className?: string;
-  big?: boolean;
-  tall?: boolean;
+  eyebrow: string;
+  title: string;
+  body: string;
+  points: string[];
+  visual: React.ReactNode;
+  reverse?: boolean;
 }) {
-  // Wide cards (2 columns) in the lower rows get a small illustration too.
-  const wide = !big && !!className?.includes("col-span-2");
-  const Icon = ICONS[feature.icon];
   return (
-    <div className={cn("relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card p-6", className)}>
-      <span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-        <Icon className="size-5" />
-      </span>
-      <h3 className={cn("mt-5 font-semibold", big && "font-heading text-2xl font-medium")}>{feature.title}</h3>
-      <p className="mt-2 max-w-md text-sm text-muted-foreground">{feature.body}</p>
-      {big ? <InboxBoard /> : null}
-      {tall ? <BroadcastPreview /> : null}
-      {wide && feature.icon === "automations" ? <AutomationChain /> : null}
-      {wide && feature.icon === "api" ? <ApiSnippet /> : null}
+    <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+      <div className={cn("min-w-0", reverse && "lg:order-2")}>
+        <p className="text-sm font-medium text-primary">{eyebrow}</p>
+        <h3 className="font-display mt-3 text-2xl text-balance sm:text-4xl">{title}</h3>
+        <p className="mt-4 text-pretty text-muted-foreground">{body}</p>
+        <ul className="mt-6 space-y-2.5 text-sm">
+          {points.map((pt) => (
+            <li key={pt} className="flex items-center gap-2">
+              <Check className="size-4 shrink-0 text-primary" /> {pt}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className={cn("min-w-0 rounded-xl border border-border bg-background p-4 sm:p-6", reverse && "lg:order-1")}>{visual}</div>
     </div>
   );
 }
 
-/** Mini kanban of real-looking conversations for the "Shared team inbox" card. */
-function InboxBoard() {
-  const columns: { label: string; dot: string; chats: { name: string; text: string; agent?: string }[] }[] = [
-    {
-      label: "Assigned",
-      dot: "bg-primary",
-      chats: [
-        { name: "Priya Sharma", text: "Deliver to Pune by Friday?", agent: "RK" },
-        { name: "Aditya Verma", text: "Need GST invoices for B2B", agent: "SM" },
-      ],
-    },
-    {
-      label: "Open",
-      dot: "bg-amber-500",
-      chats: [
-        { name: "Vikram Singh", text: "Order #4821 update?" },
-        { name: "Kavya Reddy", text: "Do you ship abroad?" },
-      ],
-    },
-    {
-      label: "Resolved",
-      dot: "bg-emerald-500",
-      chats: [{ name: "Sneha Kapoor", text: "Loved the packaging! 😊" }],
-    },
-  ];
-  return (
-    <div aria-hidden className="mt-6 grid flex-1 gap-2 sm:grid-cols-3">
-      {columns.map((col) => (
-        <div key={col.label} className="min-w-0 rounded-2xl border border-border bg-background p-2.5">
-          <p className="mb-2 flex items-center gap-1.5 px-0.5 text-[11px] font-medium text-muted-foreground">
-            <span className={cn("size-1.5 rounded-full", col.dot)} />
-            {col.label}
-            <span className="ml-auto rounded-full bg-muted px-1.5 text-[10px]">{col.chats.length}</span>
-          </p>
-          <div className="space-y-1.5">
-            {col.chats.map((c) => (
-              <div key={c.name} className="flex items-center gap-2 rounded-xl border border-border/70 bg-card p-2">
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-[10px] font-semibold text-primary">
-                  {c.name[0]}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-[11px] font-medium">{c.name}</p>
-                  <p className="truncate text-[10px] text-muted-foreground">{c.text}</p>
-                </div>
-                {c.agent ? (
-                  <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-foreground text-[8px] font-semibold text-background">
-                    {c.agent}
-                  </span>
-                ) : null}
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-/** Trigger → wait → action chain for the wide "Automations" card. */
+/** Trigger → wait → action chain. */
 function AutomationChain() {
-  const steps = [
+  const chain = [
     { tag: "When", text: "Message contains “price”" },
     { tag: "Wait", text: "2 minutes" },
-    { tag: "Then", text: "Send price list · Tag: Lead" },
+    { tag: "Then", text: "Send price list · tag Lead" },
   ];
   return (
-    <div aria-hidden className="mt-6 flex flex-wrap items-center gap-2">
-      {steps.map((st, i) => (
-        <div key={st.tag} className="flex items-center gap-2">
-          <div className="rounded-xl border border-border bg-background px-3 py-2 text-[11px]">
-            <span className="mr-1.5 rounded-md bg-primary/10 px-1.5 py-0.5 font-semibold text-primary">{st.tag}</span>
+    <div aria-hidden className="rounded-lg border border-border bg-card p-4">
+      <p className="mb-3 flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+        <Zap className="size-3.5" /> Price enquiry follow-up
+        <span className="ml-auto rounded-md bg-emerald-500/10 px-1.5 py-0.5 text-[10px] text-emerald-700 dark:text-emerald-300">Active</span>
+      </p>
+      <ol className="space-y-2">
+        {chain.map((st) => (
+          <li key={st.tag} className="flex items-center gap-2.5 rounded-md border border-border bg-background px-3 py-2 text-xs">
+            <span className="w-10 shrink-0 font-mono text-[11px] text-primary">{st.tag}</span>
             {st.text}
-          </div>
-          {i < steps.length - 1 ? <ArrowRight className="size-3.5 text-muted-foreground" /> : null}
-        </div>
-      ))}
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
 
-/** Tiny REST example for the wide "API & webhooks" card. */
+/** Tiny REST example. */
 function ApiSnippet() {
   return (
-    <div
-      aria-hidden
-      className="mt-6 space-y-1 rounded-xl border border-border bg-background p-3 font-mono text-[11px] leading-relaxed text-muted-foreground"
-    >
+    <div aria-hidden className="space-y-1 rounded-lg border border-border bg-card p-4 font-mono text-[11px] leading-relaxed text-muted-foreground">
       <p>
         <span className="text-primary">POST</span> /api/v1/messages
       </p>
@@ -469,44 +472,42 @@ function ApiSnippet() {
   );
 }
 
-/** Campaign preview filling the tall "Broadcast campaigns" card. Illustrative numbers. */
+/** Campaign preview. Illustrative numbers. */
 function BroadcastPreview() {
-  const stats = [
+  const rows = [
     { label: "Delivered", pct: 96 },
     { label: "Read", pct: 81 },
     { label: "Replied", pct: 34 },
   ];
   return (
-    <div aria-hidden className="mt-6 flex flex-1 flex-col gap-3">
-      <div className="rounded-2xl border border-border bg-background p-3">
-        <div className="flex items-center justify-between text-[11px]">
-          <span className="font-medium">Diwali sale</span>
-          <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] text-emerald-700 dark:text-emerald-300">Sent</span>
-        </div>
-        <p className="mt-1 text-[10px] text-muted-foreground">Tag: VIP, Repeat buyer · 2,400 contacts</p>
-      </div>
-      <div className="flex-1 rounded-2xl bg-muted/50 p-3">
-        <div className="max-w-[92%] rounded-xl rounded-tl-sm bg-card p-2.5 text-[11px] shadow-sm">
-          <p className="font-medium">🪔 Hi Priya, our Diwali sale is live!</p>
-          <p className="mt-1 text-muted-foreground">Flat 20% off sarees till Sunday. Reply YES to reserve yours.</p>
-          <div className="mt-2 grid grid-cols-2 gap-1 text-center text-[10px] font-medium text-primary">
+    <div aria-hidden className="grid gap-4 sm:grid-cols-[1fr_0.9fr]">
+      <div className="rounded-lg bg-muted p-3">
+        <div className="max-w-[94%] rounded-lg rounded-tl-sm bg-card p-3 text-[12px] shadow-xs">
+          <p className="font-medium">Hi Priya, our Diwali sale is live</p>
+          <p className="mt-1 text-muted-foreground">Flat 20% off silk sarees till Sunday. Reply YES to reserve yours.</p>
+          <div className="mt-2.5 grid grid-cols-2 gap-1 text-center text-[11px] font-medium text-primary">
             <span className="rounded-md border border-border py-1">Shop now</span>
             <span className="rounded-md border border-border py-1">YES</span>
           </div>
         </div>
       </div>
-      <div className="space-y-2">
-        {stats.map((st, i) => (
-          <div key={st.label}>
-            <div className="mb-1 flex justify-between text-[11px]">
-              <span className="text-muted-foreground">{st.label}</span>
-              <span className="font-medium tabular-nums">{st.pct}%</span>
+      <div className="rounded-lg border border-border bg-card p-4">
+        <p className="text-xs font-medium">Diwali sale</p>
+        <p className="mt-0.5 text-[11px] text-muted-foreground">VIP, Repeat buyer · 2,400 contacts</p>
+        <div className="mt-4 space-y-3">
+          {rows.map((st) => (
+            <div key={st.label}>
+              <div className="mb-1 flex justify-between text-[11px]">
+                <span className="text-muted-foreground">{st.label}</span>
+                <span className="font-medium tabular-nums">{st.pct}%</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-muted">
+                <div className="h-full rounded-full bg-primary" style={{ width: `${st.pct}%` }} />
+              </div>
             </div>
-            <div className="h-2 rounded-full bg-muted">
-              <div className="h-full rounded-full bg-primary" style={{ width: `${st.pct}%`, opacity: 1 - i * 0.22 }} />
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
+        <p className="mt-4 text-[10px] text-muted-foreground">Sample campaign</p>
       </div>
     </div>
   );
@@ -519,13 +520,13 @@ function BroadcastPreview() {
 function SecondaryCta({ live }: { live: boolean }) {
   if (live) {
     return (
-      <DemoButton variant="outline" className={pill}>
+      <DemoButton variant="outline" className={ctaLg}>
         {hero.secondaryCta}
       </DemoButton>
     );
   }
   return (
-    <Link href="/demo" className={cn(buttonVariants({ variant: "outline", size: "lg" }), pill)}>
+    <Link href="/demo" className={cn(buttonVariants({ variant: "outline", size: "lg" }), ctaLg)}>
       Book a demo
     </Link>
   );
@@ -534,26 +535,19 @@ function SecondaryCta({ live }: { live: boolean }) {
 /** Shown when the plan catalogue can't be loaded (e.g. billing migration not applied yet). */
 function PricingFallback() {
   return (
-    <div className="mt-12">
-      <div className="grid items-center gap-8 rounded-3xl border border-border bg-card p-8 sm:p-12 lg:grid-cols-[1fr_auto]">
-        <div>
-          <ul className="grid gap-2.5 text-sm text-muted-foreground sm:grid-cols-2">
-            {[
-              "Plans from ₹1,999/month",
-              "Save 20% with annual billing",
-              "No markup on Meta message fees",
-              "GST invoices for every payment",
-            ].map((item) => (
-              <li key={item} className="flex items-center gap-2">
-                <Check className="size-4 text-primary" /> {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-        <Link href="/pricing" className={cn(buttonVariants({ size: "lg" }), pill)}>
-          See pricing <ArrowRight className="size-4" />
-        </Link>
-      </div>
+    <div className="mt-12 grid items-center gap-8 rounded-2xl border border-border bg-card p-8 sm:p-12 lg:grid-cols-[1fr_auto]">
+      <ul className="grid gap-2.5 text-sm text-muted-foreground sm:grid-cols-2">
+        {["Plans from ₹1,999/month", "Save 20% with annual billing", "No markup on Meta message fees", "GST invoices for every payment"].map(
+          (item) => (
+            <li key={item} className="flex items-center gap-2">
+              <Check className="size-4 text-primary" /> {item}
+            </li>
+          ),
+        )}
+      </ul>
+      <Link href="/pricing" className={cn(buttonVariants({ size: "lg" }), ctaLg)}>
+        See pricing <ArrowRight className="size-4" />
+      </Link>
     </div>
   );
 }

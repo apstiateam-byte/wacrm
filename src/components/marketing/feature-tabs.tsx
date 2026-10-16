@@ -9,51 +9,58 @@ import { productTour } from "@/content/marketing";
 type TourId = (typeof productTour)[number]["id"];
 
 /**
- * Product tour: a row of pill tabs (like the category chips on modern
- * SaaS galleries) switching a two-column panel of copy + illustration.
+ * Product tour: a vertical tab list (horizontal scroll on mobile) beside
+ * a panel with the selected feature's copy and a live-looking preview.
  */
 export function FeatureTabs() {
   const [active, setActive] = useState<TourId>(productTour[0].id);
   const item = productTour.find((p) => p.id === active) ?? productTour[0];
 
   return (
-    <div>
-      <div role="tablist" aria-label="Product tour" className="flex flex-wrap justify-center gap-2">
-        {productTour.map((p) => (
-          <button
-            key={p.id}
-            role="tab"
-            id={`tab-${p.id}`}
-            aria-selected={p.id === active}
-            aria-controls={`panel-${p.id}`}
-            onClick={() => setActive(p.id)}
-            className={cn(
-              "rounded-full border px-4 py-2 text-sm font-medium transition-colors",
-              p.id === active
-                ? "border-foreground bg-foreground text-background"
-                : "border-border bg-card text-muted-foreground hover:border-foreground/30 hover:text-foreground",
-            )}
-          >
-            {p.label}
-          </button>
-        ))}
+    <div className="grid gap-6 lg:grid-cols-[17rem_1fr] lg:gap-10">
+      <div
+        role="tablist"
+        aria-label="Product tour"
+        aria-orientation="vertical"
+        className="-mx-4 flex gap-1 overflow-x-auto px-4 lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0"
+      >
+        {productTour.map((p) => {
+          const selected = p.id === active;
+          return (
+            <button
+              key={p.id}
+              role="tab"
+              id={`tab-${p.id}`}
+              aria-selected={selected}
+              aria-controls={`panel-${p.id}`}
+              onClick={() => setActive(p.id)}
+              className={cn(
+                "shrink-0 rounded-lg px-3.5 py-2.5 text-left text-sm transition-colors lg:border-l-2 lg:rounded-none lg:rounded-r-lg lg:py-3",
+                selected
+                  ? "bg-card font-medium text-foreground shadow-xs ring-1 ring-border lg:border-primary lg:ring-0 lg:shadow-none lg:bg-card"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground lg:border-transparent",
+              )}
+            >
+              {p.label}
+              <span className="mt-0.5 hidden text-xs font-normal text-muted-foreground lg:block">{p.title}</span>
+            </button>
+          );
+        })}
       </div>
 
       <div
         role="tabpanel"
         id={`panel-${item.id}`}
         aria-labelledby={`tab-${item.id}`}
-        className="mt-10 grid items-center gap-10 rounded-3xl border border-border bg-card p-6 sm:p-10 lg:grid-cols-2"
+        className="grid items-center gap-8 rounded-xl border border-border bg-card p-6 sm:p-8 xl:grid-cols-[0.9fr_1.1fr]"
       >
         <div className="min-w-0">
-          <h3 className="font-heading text-2xl sm:text-3xl">{item.title}</h3>
-          <p className="mt-4 text-muted-foreground">{item.body}</p>
+          <h3 className="font-display text-2xl sm:text-3xl">{item.title}</h3>
+          <p className="mt-3 text-pretty text-muted-foreground">{item.body}</p>
           <ul className="mt-6 space-y-2.5">
             {item.points.map((pt) => (
               <li key={pt} className="flex items-center gap-2 text-sm">
-                <span className="flex size-5 items-center justify-center rounded-full bg-primary/12 text-primary">
-                  <Check className="size-3" />
-                </span>
+                <Check className="size-4 shrink-0 text-primary" />
                 {pt}
               </li>
             ))}
@@ -66,7 +73,7 @@ export function FeatureTabs() {
 }
 
 function TourVisual({ id }: { id: TourId }) {
-  const frame = "min-w-0 rounded-2xl border border-border bg-background p-5 text-sm";
+  const frame = "min-w-0 rounded-lg border border-border bg-background p-5 text-sm";
   if (id === "broadcasts") {
     const rows = [
       ["Delivered", 96],
@@ -122,7 +129,7 @@ function TourVisual({ id }: { id: TourId }) {
       <div aria-hidden className={cn(frame, "space-y-3")}>
         <p className="w-fit max-w-[85%] rounded-xl rounded-tl-sm bg-muted px-3 py-2">What are your store timings on Sunday?</p>
         <div className="ml-auto w-fit max-w-[85%] rounded-xl rounded-tr-sm bg-primary px-3 py-2 text-primary-foreground">
-          We&apos;re open 11am–7pm on Sundays 😊
+          We&apos;re open 11am–7pm on Sundays.
         </div>
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Bot className="size-3.5 text-primary" /> Answered by AI from “Store FAQ”

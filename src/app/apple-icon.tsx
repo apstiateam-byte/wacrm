@@ -12,7 +12,7 @@ export default function AppleIcon() {
   return new ImageResponse(
     (
       <svg width="180" height="180" viewBox="0 0 48 48">
-        <rect width="48" height="48" fill="#b8603d" />
+        <rect width="48" height="48" fill="#0e8f63" />
         <path d={LOGO_BUBBLE_PATH} fill="none" stroke="#ffffff" strokeWidth="2.6" strokeLinejoin="round" />
         {LOGO_BARS.map(([x, y, h]) => (
           <rect key={x} x={x} y={y} width="3.6" height={h} rx="1.2" fill="#ffffff" />

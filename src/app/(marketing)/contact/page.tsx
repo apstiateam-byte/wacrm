@@ -19,7 +19,7 @@ export default function ContactPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6">
-      <h1 className="text-3xl font-bold tracking-tight">Contact us</h1>
+      <h1 className="font-display text-3xl sm:text-4xl">Contact us</h1>
       <p className="mt-3 text-muted-foreground">
         Questions about plans, onboarding or your account? We usually reply within one business day.
       </p>

@@ -75,7 +75,7 @@ export function AdminShell({ email, children }: { email: string | null; children
                   aria-current={active ? "page" : undefined}
                   className={cn(
                     "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                    active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                    active ? "bg-sidebar-accent text-foreground [&>svg]:text-primary" : "text-muted-foreground hover:bg-sidebar-accent/70 hover:text-foreground",
                   )}
                 >
                   <item.icon className="size-4 shrink-0" />
@@ -114,7 +114,7 @@ export function AdminShell({ email, children }: { email: string | null; children
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      <aside className="hidden w-64 shrink-0 border-r border-border bg-card lg:block">{sidebar}</aside>
+      <aside className="hidden w-64 shrink-0 border-r border-border bg-sidebar lg:block">{sidebar}</aside>
 
       {open ? (
         <div className="fixed inset-0 z-50 lg:hidden">

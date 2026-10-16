@@ -75,7 +75,7 @@ export function PricingTable({
   return (
     <>
       <div className="mt-10 flex justify-center">
-        <div className="inline-flex rounded-lg border border-border bg-card p-1" role="radiogroup" aria-label="Billing period">
+        <div className="inline-flex rounded-lg border border-border bg-muted p-1" role="radiogroup" aria-label="Billing period">
           {(["monthly", "annual"] as const).map((value) => (
             <button
               key={value}
@@ -85,11 +85,11 @@ export function PricingTable({
               onClick={() => setBillingInterval(value)}
               className={cn(
                 "rounded-md px-4 py-2 text-sm font-medium transition-colors",
-                interval === value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
+                interval === value ? "bg-card text-foreground shadow-xs" : "text-muted-foreground hover:text-foreground",
               )}
             >
               {value === "monthly" ? "Monthly" : "Annual"}
-              {value === "annual" && saving > 0 ? <span className="ml-1.5 text-xs opacity-80">save {saving}%</span> : null}
+              {value === "annual" && saving > 0 ? <span className="ml-1.5 text-xs font-semibold text-primary">−{saving}%</span> : null}
             </button>
           ))}
         </div>
@@ -107,12 +107,12 @@ export function PricingTable({
             <div
               key={plan.code}
               className={cn(
-                "relative flex flex-col rounded-2xl border bg-card p-6",
-                plan.highlighted ? "border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/40" : "border-border",
+                "relative flex flex-col rounded-xl border bg-card p-6",
+                plan.highlighted ? "border-primary ring-1 ring-primary" : "border-border",
               )}
             >
               {plan.highlighted ? (
-                <span className="absolute -top-3 left-6 rounded-full bg-primary px-2.5 py-0.5 text-xs font-semibold text-primary-foreground">
+                <span className="absolute -top-2.5 left-6 rounded-md bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground">
                   Most popular
                 </span>
               ) : null}
@@ -120,10 +120,10 @@ export function PricingTable({
               <p className="mt-1 min-h-10 text-sm text-muted-foreground">{plan.description}</p>
               <div className="mt-5 min-h-[4.5rem]">
                 {plan.contact_sales || monthly == null ? (
-                  <p className="text-3xl font-bold">Custom</p>
+                  <p className="font-display text-3xl">Custom</p>
                 ) : (
                   <>
-                    <p className="text-3xl font-bold">
+                    <p className="font-display text-[2rem] tabular-nums">
                       {formatInr(monthly)}
                       <span className="text-sm font-normal text-muted-foreground">/month</span>
                     </p>
@@ -180,7 +180,8 @@ export function PricingTable({
 
       {compact ? (
         <p className="mt-8 text-center text-sm text-muted-foreground">
-          Prices exclude GST. WhatsApp message charges are billed by Meta with no markup.{" "}
+          {tax.gstPercent > 0 ? (tax.pricesIncludeGst ? `Prices include ${tax.gstPercent}% GST. ` : `Prices exclude ${tax.gstPercent}% GST. `) : ""}
+          WhatsApp message charges are billed by Meta with no markup.{" "}
           <Link href="/pricing" className="font-medium text-primary underline-offset-4 hover:underline">
             Compare all features & add-ons →
           </Link>
@@ -233,7 +234,7 @@ export function PricingTable({
 
       {addons.length ? (
         <div className="mt-16">
-          <h2 className="text-center text-2xl font-bold tracking-tight">Add-ons</h2>
+          <h2 className="text-center font-display text-2xl sm:text-3xl">Add-ons</h2>
           <div className="mx-auto mt-8 grid max-w-4xl gap-4 sm:grid-cols-3">
             {addons.map((a) => (
               <div key={a.code} className="rounded-xl border border-border bg-card p-5">

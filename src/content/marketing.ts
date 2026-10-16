@@ -32,7 +32,7 @@ export function marketingSiteEnabled(): boolean {
 }
 
 export const hero = {
-  eyebrow: 'Official WhatsApp Business API',
+  eyebrow: 'Built on the WhatsApp Business Platform from Meta',
   title: 'Sell, support and grow on WhatsApp — from one shared inbox',
   subtitle:
     'Broadcast campaigns, chatbot flows, AI replies and a sales pipeline for your whole team. Start in minutes, no code required.',

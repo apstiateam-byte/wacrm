@@ -48,14 +48,14 @@ const ENTITY = env('NEXT_PUBLIC_LEGAL_ENTITY', BRAND);
 
 // Brand palette (Clay theme, light): see src/app/globals.css.
 const C = {
-  paper: '#f6f3ec',
-  card: '#fdfcf9',
-  ink: '#2b2622',
-  muted: '#6f675e',
-  faint: '#9b9288',
-  border: '#e7e1d6',
-  clay: '#b8603d',
-  claySoft: '#f6e7df',
+  paper: '#f5f7f9',
+  card: '#ffffff',
+  ink: '#14171d',
+  muted: '#5b6370',
+  faint: '#8a919c',
+  border: '#e4e7eb',
+  clay: '#0e8f63', // brand accent (Jade)
+  claySoft: '#e3f4ed',
 };
 
 const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);

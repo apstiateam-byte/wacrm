@@ -32,7 +32,7 @@ export default async function PricingPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
       <div className="mx-auto max-w-2xl text-center">
-        <h1 className="text-4xl font-bold tracking-tight">Plans for every stage of growth</h1>
+        <h1 className="font-display text-4xl sm:text-5xl">Plans for every stage of growth</h1>
         <p className="mt-4 text-lg text-muted-foreground">
           Start with a 14-day free trial of Growth. No card required — pick a plan when you&apos;re ready.
         </p>
@@ -55,7 +55,7 @@ export default async function PricingPage() {
       </div>
 
       <div className="mx-auto mt-16 max-w-3xl">
-        <h2 className="text-center text-2xl font-bold tracking-tight">Pricing FAQ</h2>
+        <h2 className="text-center font-display text-2xl sm:text-3xl">Pricing FAQ</h2>
         <div className="mt-8 divide-y divide-border rounded-xl border border-border bg-card">
           {faqs.map((f) => (
             <details key={f.q} className="group p-5">

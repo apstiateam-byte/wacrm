@@ -9,7 +9,7 @@ import { APP_NAME } from "@/lib/brand";
 // Colours come from the theme tokens (--primary / --primary-foreground)
 // so the mark follows the accent theme and light/dark mode. The static
 // copies in src/app/icon.tsx, src/app/apple-icon.tsx and public/brand/
-// use the Clay hex (#b8603d) instead — keep the paths in sync.
+// use the Jade hex (#0e8f63) instead — keep the paths in sync.
 // ============================================================
 
 /** Bubble outline path on the 48×48 grid (shared with the icon routes). */
