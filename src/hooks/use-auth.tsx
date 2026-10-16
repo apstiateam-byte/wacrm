@@ -10,6 +10,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
+import { ACCOUNT_REMOVED_ERROR, profileExists } from "@/lib/auth/profile-guard";
 import { createClient } from "@/lib/supabase/client";
 import type { User } from "@supabase/supabase-js";
 import { DEFAULT_CURRENCY } from "@/lib/currency";
@@ -133,6 +134,18 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+/** How often a signed-in tab re-checks that its profile still exists. */
+const PROFILE_RECHECK_MS = 60_000;
+
+/** Signs out a session whose profile row is gone and explains why. */
+async function endRemovedSession(): Promise<void> {
+  try {
+    await createClient().auth.signOut();
+  } finally {
+    window.location.href = `/login?error=${ACCOUNT_REMOVED_ERROR}`;
+  }
+}
 
 /** Attempts at the profile lookup, including the first. */
 const PROFILE_FETCH_ATTEMPTS = 2;
@@ -293,8 +306,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           );
         }
       } else {
+        // No profile row: the account was removed (or never set up).
+        // End the session instead of leaving a signed-in shell that
+        // can't do anything.
         lastFetchedUserIdRef.current = null;
         setStatusDetail("no profiles row for the signed-in user");
+        await endRemovedSession();
+        return;
       }
     } catch (err) {
       console.error("[AuthProvider] fetchProfile threw:", err);
@@ -379,6 +397,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       subscription.unsubscribe();
     };
   }, [fetchProfile]);
+
+  // While signed in, re-check that the profile still exists when the
+  // tab regains focus and once a minute, so a deleted account is
+  // signed out without waiting for the next page load.
+  useEffect(() => {
+    const userId = user?.id;
+    if (!userId) return;
+    let stopped = false;
+    const check = async () => {
+      if (stopped || document.visibilityState !== "visible") return;
+      if ((await profileExists(createClient(), userId)) === false && !stopped) {
+        stopped = true;
+        await endRemovedSession();
+      }
+    };
+    const onVisible = () => void check();
+    document.addEventListener("visibilitychange", onVisible);
+    const timer = setInterval(() => void check(), PROFILE_RECHECK_MS);
+    return () => {
+      stopped = true;
+      document.removeEventListener("visibilitychange", onVisible);
+      clearInterval(timer);
+    };
+  }, [user?.id]);
 
   const signOut = useCallback(async () => {
     const supabase = createClient();

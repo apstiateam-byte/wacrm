@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { ACCOUNT_REMOVED_ERROR, profileExists } from '@/lib/auth/profile-guard'
 
 export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -42,17 +43,38 @@ export async function proxy(request: NextRequest) {
     return response
   }
 
+  // Protected pages - redirect to login if not authenticated
+  // Every top-level route under src/app/(dashboard)/ belongs here —
+  // proxy.test.ts reads that directory and fails on a missing one.
+  const protectedPaths = ['/dashboard', '/inbox', '/contacts', '/pipelines', '/broadcasts', '/automations', '/flows', '/agents', '/notifications', '/settings', '/admin']
+  const isProtectedPage = protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))
+  const isAuthPage =
+    request.nextUrl.pathname === '/login' ||
+    request.nextUrl.pathname === '/signup' ||
+    request.nextUrl.pathname === '/forgot-password'
+
+  // A session whose profile row was deleted belongs to a removed
+  // account: end it rather than letting it into the app. Only page
+  // loads pay for this lookup, and a failed lookup never signs out.
+  if (user && (isProtectedPage || isAuthPage) && (await profileExists(supabase, user.id)) === false) {
+    // signOut() clears the auth cookies through setAll() above.
+    await supabase.auth.signOut()
+    if (request.nextUrl.pathname === '/login' && request.nextUrl.searchParams.get('error') === ACCOUNT_REMOVED_ERROR) {
+      return supabaseResponse
+    }
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    url.search = `?error=${ACCOUNT_REMOVED_ERROR}`
+    return withRefreshedCookies(NextResponse.redirect(url))
+  }
+
   // Auth pages - redirect to dashboard if already logged in.
   // Exception: when an invite token is in the query string we
   // send the already-signed-in user to /join/<token> instead so
   // they can accept the invitation in one click. Without this,
   // a forwarded invite link to someone who's already signed in
   // would silently drop them on /dashboard.
-  if (user && (
-    request.nextUrl.pathname === '/login' ||
-    request.nextUrl.pathname === '/signup' ||
-    request.nextUrl.pathname === '/forgot-password'
-  )) {
+  if (user && isAuthPage) {
     const url = request.nextUrl.clone()
     const inviteToken = request.nextUrl.searchParams.get('invite')
     if (
@@ -70,10 +92,7 @@ export async function proxy(request: NextRequest) {
   }
 
   // Protected pages - redirect to login if not authenticated
-  // Every top-level route under src/app/(dashboard)/ belongs here —
-  // proxy.test.ts reads that directory and fails on a missing one.
-  const protectedPaths = ['/dashboard', '/inbox', '/contacts', '/pipelines', '/broadcasts', '/automations', '/flows', '/agents', '/notifications', '/settings', '/admin']
-  if (!user && protectedPaths.some(path => request.nextUrl.pathname.startsWith(path))) {
+  if (!user && isProtectedPage) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return withRefreshedCookies(NextResponse.redirect(url))

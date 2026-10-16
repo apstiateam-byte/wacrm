@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { ACCOUNT_REMOVED_ERROR, profileExists } from "@/lib/auth/profile-guard";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,7 +47,9 @@ function LoginPageInner() {
       ? t("linkExpired")
       : linkError === "link_invalid"
         ? t("linkInvalid")
-        : null;
+        : linkError === ACCOUNT_REMOVED_ERROR
+          ? t("accountRemoved")
+          : null;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -59,13 +62,22 @@ function LoginPageInner() {
     setError(null);
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: signIn, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
       setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    // The login exists in Supabase Auth but its profile was deleted —
+    // the account is gone, so don't keep the session.
+    if (signIn.user && (await profileExists(supabase, signIn.user.id)) === false) {
+      await supabase.auth.signOut();
+      setError(t("accountRemoved"));
       setLoading(false);
       return;
     }
