@@ -6,6 +6,7 @@ import {
   parseEmailLink,
   parseSupabaseError,
   relativeRedirect,
+  nextFromRedirectTo,
   safeNextPath,
 } from './callback';
 
@@ -157,5 +158,25 @@ describe('relativeRedirect', () => {
   it('never upgrades the path to an absolute URL', () => {
     const res = relativeRedirect('/dashboard');
     expect(res.headers.get('location')).not.toMatch(/^https?:/);
+  });
+});
+
+describe('nextFromRedirectTo', () => {
+  it('unwraps our own /auth/callback?next=…', () => {
+    expect(nextFromRedirectTo('https://app.example/auth/callback?next=%2Fjoin%2Fabc')).toBe('/join/abc');
+    expect(nextFromRedirectTo('https://app.example/auth/callback?next=/reset-password')).toBe('/reset-password');
+  });
+
+  it('uses the path of any other URL, never its host', () => {
+    expect(nextFromRedirectTo('https://evil.example/inbox?c=1')).toBe('/inbox?c=1');
+  });
+
+  it('is null for the bare Site URL or junk', () => {
+    expect(nextFromRedirectTo('https://app.example')).toBeNull();
+    expect(nextFromRedirectTo('https://app.example/')).toBeNull();
+    expect(nextFromRedirectTo('https://app.example/auth/callback')).toBeNull();
+    expect(nextFromRedirectTo('https://app.example/auth/callback?next=//evil.example')).toBeNull();
+    expect(nextFromRedirectTo('')).toBeNull();
+    expect(nextFromRedirectTo(null)).toBeNull();
   });
 });

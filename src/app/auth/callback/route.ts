@@ -16,7 +16,9 @@
 //                             (expired / used). Send to /login with a
 //                             reason it can explain.
 //   2. `?code=...`          → PKCE exchange (default email templates).
-//      `?token_hash=&type=` → verifyOtp (templates using {{ .TokenHash }}).
+//      `?token_hash=&type=` → verifyOtp (templates using {{ .TokenHash }},
+//                             which link straight to this site instead of
+//                             through the Supabase project URL).
 //   3. success              → 303 to the validated `next` path
 //                             (/dashboard, /reset-password, /join/<t>).
 //      failure              → 303 to /login?error=link_invalid.
@@ -32,6 +34,7 @@
 import { createClient } from '@/lib/supabase/server';
 import {
   loginFailurePath,
+  nextFromRedirectTo,
   parseEmailLink,
   parseSupabaseError,
   relativeRedirect,
@@ -43,7 +46,11 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const next = safeNextPath(searchParams.get('next'));
+  // Templates linking straight here also pass `redirect_to` (the URL
+  // the app asked Supabase to return to) — it wins over the template's
+  // default `next`, e.g. an invite sign-up returning to /join/<token>.
+  const next =
+    nextFromRedirectTo(searchParams.get('redirect_to')) ?? safeNextPath(searchParams.get('next'));
 
   const upstreamError = parseSupabaseError(searchParams);
   if (upstreamError) {

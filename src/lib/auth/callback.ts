@@ -56,6 +56,32 @@ export function safeNextPath(
   return value;
 }
 
+/**
+ * The in-app path carried by a template's `redirect_to={{ .RedirectTo }}`,
+ * or null when there isn't a useful one.
+ *
+ * `{{ .RedirectTo }}` is the absolute URL the app passed as
+ * `emailRedirectTo` / `redirectTo` — normally our own
+ * `/auth/callback?next=/join/abc` — or the bare Site URL when none was
+ * passed. Only the path is ever used (never the host), so this can't
+ * become an open redirect; it still goes through `safeNextPath`.
+ */
+export function nextFromRedirectTo(raw: string | null | undefined): string | null {
+  if (typeof raw !== 'string' || raw.trim() === '') return null;
+  let url: URL;
+  try {
+    url = new URL(raw.trim(), 'http://placeholder.invalid');
+  } catch {
+    return null;
+  }
+  if (url.pathname === '/auth/callback') {
+    const inner = url.searchParams.get('next');
+    return inner ? safeNextPath(inner, '') || null : null;
+  }
+  if (url.pathname === '/' || url.pathname === '') return null;
+  return safeNextPath(`${url.pathname}${url.search}`, '') || null;
+}
+
 /** Values Supabase's `verifyOtp` accepts for an emailed `token_hash`. */
 const EMAIL_OTP_TYPES: ReadonlySet<string> = new Set<EmailOtpType>([
   'signup',

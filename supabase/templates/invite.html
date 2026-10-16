@@ -23,15 +23,15 @@
         
         <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px 0 8px">
           <tr><td style="border-radius:999px;background:#b8603d">
-            <a href="{{ .ConfirmationURL }}" target="_blank" style="display:inline-block;padding:13px 26px;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:999px">Accept invitation</a>
+            <a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=invite&next=/dashboard&redirect_to={{ .RedirectTo }}" target="_blank" style="display:inline-block;padding:13px 26px;font-family:Helvetica,Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;border-radius:999px">Accept invitation</a>
           </td></tr>
         </table>
         <p style="margin:18px 0 0;font-size:12px;line-height:1.6;color:#9b9288">Button not working? Copy this link into your browser:<br>
-          <a href="{{ .ConfirmationURL }}" style="color:#b8603d;word-break:break-all">{{ .ConfirmationURL }}</a></p>
+          <a href="{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=invite&next=/dashboard&redirect_to={{ .RedirectTo }}" style="color:#b8603d;word-break:break-all">{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=invite&next=/dashboard&redirect_to={{ .RedirectTo }}</a></p>
         <p style="margin:24px 0 0;padding-top:18px;border-top:1px solid #e7e1d6;font-size:13px;line-height:1.6;color:#9b9288">Not expecting this? You can ignore this email.</p>
       </td></tr>
       <tr><td align="center" style="padding:22px 8px 0;font-family:Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#9b9288">
-        © Cluade<br>
+        © Cluade · <a href="mailto:support@cluade.si" style="color:#9b9288">support@cluade.si</a><br>
         You received this email because of an action on your Cluade account.
       </td></tr>
     </table>

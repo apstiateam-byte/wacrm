@@ -18,6 +18,12 @@
 // Supabase fills the {{ .Variables }} at send time — {{ .SiteURL }} is
 // your Site URL, so the logo loads from your own deployment
 // (/apple-icon, a PNG; SVG is blocked by Gmail and Outlook).
+//
+// Buttons link straight to {{ .SiteURL }}/auth/callback with
+// {{ .TokenHash }} (verified there with verifyOtp) instead of
+// {{ .ConfirmationURL }}, which goes through the <project>.supabase.co
+// URL first. `redirect_to={{ .RedirectTo }}` carries where the app asked
+// to return (e.g. /join/<token> for invite sign-ups).
 // ============================================================
 
 import { mkdirSync, readFileSync, existsSync, writeFileSync } from 'node:fs';
@@ -116,7 +122,7 @@ const T = {
       preheader: `One click to finish setting up your ${BRAND} account.`,
       heading: 'Confirm your email',
       intro: `Welcome to ${esc(BRAND)}! Confirm <strong style="color:${C.ink}">{{ .Email }}</strong> to finish creating your account and start your free trial.`,
-      button: { label: 'Confirm email', url: '{{ .ConfirmationURL }}' },
+      button: { label: 'Confirm email', url: '{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email&next=/dashboard&redirect_to={{ .RedirectTo }}' },
       after: "If you didn't sign up, you can safely ignore this email — no account will be created.",
     }),
   },
@@ -126,7 +132,7 @@ const T = {
       preheader: 'Use this link to choose a new password.',
       heading: 'Reset your password',
       intro: `We received a request to reset the password for <strong style="color:${C.ink}">{{ .Email }}</strong>. The link below is valid for a limited time.`,
-      button: { label: 'Choose a new password', url: '{{ .ConfirmationURL }}' },
+      button: { label: 'Choose a new password', url: '{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password&redirect_to={{ .RedirectTo }}' },
       after: "Didn't ask for this? Ignore this email — your password stays the same.",
     }),
   },
@@ -136,7 +142,7 @@ const T = {
       preheader: 'Sign in with one click.',
       heading: 'Your sign-in link',
       intro: `Click below to sign in to ${esc(BRAND)}. The link works once and expires shortly.`,
-      button: { label: 'Sign in', url: '{{ .ConfirmationURL }}' },
+      button: { label: 'Sign in', url: '{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email&next=/dashboard&redirect_to={{ .RedirectTo }}' },
       after: "If you didn't try to sign in, you can ignore this email.",
     }),
   },
@@ -146,7 +152,7 @@ const T = {
       preheader: `Accept your invitation to ${BRAND}.`,
       heading: "You're invited",
       intro: `You've been invited to join ${esc(BRAND)} — the shared WhatsApp inbox for your team. Accept the invitation to set up your account.`,
-      button: { label: 'Accept invitation', url: '{{ .ConfirmationURL }}' },
+      button: { label: 'Accept invitation', url: '{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=invite&next=/dashboard&redirect_to={{ .RedirectTo }}' },
       after: "Not expecting this? You can ignore this email.",
     }),
   },
@@ -156,7 +162,7 @@ const T = {
       preheader: 'Confirm the change to your account email.',
       heading: 'Confirm your new email',
       intro: `Confirm that you want to change your ${esc(BRAND)} account email from <strong style="color:${C.ink}">{{ .Email }}</strong> to <strong style="color:${C.ink}">{{ .NewEmail }}</strong>.`,
-      button: { label: 'Confirm email change', url: '{{ .ConfirmationURL }}' },
+      button: { label: 'Confirm email change', url: '{{ .SiteURL }}/auth/callback?token_hash={{ .TokenHash }}&type=email_change&next=/settings&redirect_to={{ .RedirectTo }}' },
       after: "Didn't request this? Don't click the link, and change your password right away.",
     }),
   },
