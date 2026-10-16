@@ -125,7 +125,10 @@ function PlatformSettingsCard({ data, onSaved }: { data: AdminOverview; onSaved:
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ settings: form }),
       });
-      if (!res.ok) toast.error(t("saveFailed"));
+      if (!res.ok) {
+        const body = (await res.json().catch(() => ({}))) as { error?: string };
+        toast.error(res.status === 409 && body.error ? body.error : t("saveFailed"));
+      }
       else {
         toast.success(t("saved"));
         await onSaved();

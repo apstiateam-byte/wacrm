@@ -149,7 +149,16 @@ export async function PATCH(request: Request) {
           .maybeSingle();
         patch.updated_at = new Date().toISOString();
         const { error } = await db.from('platform_settings').update(patch).eq('id', true);
-        if (error) throw error;
+        if (error) {
+          // 42703 / PGRST204: the column isn't in the database yet.
+          if ('prices_include_gst' in patch && (error.code === '42703' || error.code === 'PGRST204')) {
+            return NextResponse.json(
+              { error: 'Run migration 051_prices_include_gst.sql on your database first, then save again.' },
+              { status: 409 },
+            );
+          }
+          throw error;
+        }
         // The charged amount changed — cached Razorpay plans hold the old
         // amount (they're immutable), so checkout must create new ones.
         // Existing subscribers stay on their old amount until they switch.
