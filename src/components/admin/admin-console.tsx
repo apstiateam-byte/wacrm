@@ -22,7 +22,6 @@ import { SettingsPanelHead } from "@/components/settings/settings-panel-head";
 import { formatInr } from "@/lib/billing/razorpay-checkout";
 import { cn } from "@/lib/utils";
 import { FEATURE_KEYS, LIMIT_KEYS, finalPriceInr, type Addon, type Plan } from "@/lib/billing/types";
-import { AdminAccounts } from "./admin-accounts";
 import { PaymentsCard, type PaymentsInfo } from "./payments-card";
 
 interface PlatformSettings {
@@ -43,22 +42,18 @@ interface AdminOverview {
   payments: PaymentsInfo;
 }
 
-export function AdminConsole() {
+/** Loads /api/admin/settings (settings, plans, add-ons, payment config). */
+function useAdminSettings() {
   const t = useTranslations("Admin");
   const [data, setData] = useState<AdminOverview | null>(null);
-  const [forbidden, setForbidden] = useState(false);
 
   const load = useCallback(async () => {
     try {
       const res = await fetch("/api/admin/settings", { cache: "no-store" });
-      if (res.status === 403 || res.status === 401) {
-        setForbidden(true);
-        return;
-      }
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setData((await res.json()) as AdminOverview);
     } catch (err) {
-      console.error("[AdminConsole] load error:", err);
+      console.error("[admin settings] load error:", err);
       toast.error(t("loadFailed"));
     }
   }, [t]);
@@ -67,51 +62,41 @@ export function AdminConsole() {
     void load();
   }, [load]);
 
-  if (forbidden) {
-    return <p className="py-10 text-sm text-muted-foreground">{t("forbidden")}</p>;
-  }
-  if (!data) {
-    return (
-      <div className="flex items-center gap-2 py-10 text-sm text-muted-foreground">
-        <Loader2 className="size-4 animate-spin" /> {t("loading")}
-      </div>
-    );
-  }
+  return { data, load };
+}
 
-  const m = data.metrics;
-  const metrics: [string, string][] = [
-    [t("metrics.workspaces"), String(m.total)],
-    [t("metrics.trialing"), String(m.trialing)],
-    [t("metrics.paying"), String(m.active)],
-    [t("metrics.pastDue"), String(m.past_due)],
-    [t("metrics.lapsed"), String(m.lapsed)],
-    [t("metrics.mrr"), formatInr(m.mrr_inr)],
-  ];
-
+function Loading() {
+  const t = useTranslations("Admin");
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-foreground">{t("title")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{t("description")}</p>
-      </div>
-
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {metrics.map(([label, value]) => (
-          <Card key={label}>
-            <CardContent className="py-4">
-              <p className="text-xs text-muted-foreground">{label}</p>
-              <p className="mt-1 text-xl font-semibold tabular-nums text-foreground">{value}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      <PlatformSettingsCard data={data} onSaved={load} />
-      <PaymentsCard info={data.payments} onSaved={load} />
-      <PlansEditor plans={data.plans} onSaved={load} />
-      <AdminAccounts plans={data.plans} addons={data.addons} />
+    <div className="flex items-center gap-2 py-10 text-sm text-muted-foreground">
+      <Loader2 className="size-4 animate-spin" /> {t("loading")}
     </div>
   );
+}
+
+/** Owner console → Settings: billing switches, GST, Razorpay keys. */
+export function AdminSettingsView() {
+  const { data, load } = useAdminSettings();
+  if (!data) return <Loading />;
+  return (
+    <div className="space-y-8">
+      <PlatformSettingsCard data={data} onSaved={load} />
+      <PaymentsCard info={data.payments} onSaved={load} />
+    </div>
+  );
+}
+
+/** Owner console → Plans: prices, limits and features per plan. */
+export function AdminPlansView() {
+  const { data, load } = useAdminSettings();
+  if (!data) return <Loading />;
+  return <PlansEditor plans={data.plans} onSaved={load} />;
+}
+
+/** Plans + add-ons catalogue for pickers elsewhere in the console. */
+export function useAdminCatalog() {
+  const { data } = useAdminSettings();
+  return { plans: data?.plans ?? [], addons: data?.addons ?? [] };
 }
 
 function StatusDot({ ok, label }: { ok: boolean; label: string }) {

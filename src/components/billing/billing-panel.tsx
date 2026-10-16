@@ -207,7 +207,7 @@ export function BillingPanel() {
           >
             <span>{summary.is_platform_admin ? t("checkoutAdminHint") : t("checkoutNotConfigured")}</span>
             {summary.is_platform_admin ? (
-              <Link href="/admin#payments" className={buttonVariants({ size: "sm" })}>
+              <Link href="/admin/settings#payments" className={buttonVariants({ size: "sm" })}>
                 {t("checkoutAdminLink")}
               </Link>
             ) : null}

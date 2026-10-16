@@ -1,13 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Loader2, Search } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -19,190 +17,32 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { SettingsPanelHead } from "@/components/settings/settings-panel-head";
-import { isReadOnlyState, LIMIT_KEYS, type Addon, type BillingState, type Plan } from "@/lib/billing/types";
+import { LIMIT_KEYS, type Addon, type Plan } from "@/lib/billing/types";
 import type { AdminAccountRow } from "@/app/api/admin/accounts/route";
 
 const SELECT_CLASS =
   "w-full rounded-md border border-border bg-muted px-2 py-1.5 text-sm text-foreground focus:border-primary focus:outline-none";
 const STATUSES = ["trialing", "active", "past_due", "canceled", "expired"] as const;
 
-function fmtDate(iso: string | null | undefined): string {
-  return iso ? new Date(iso).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "—";
-}
-
 /** ISO → value for <input type="date">. */
 function toDateInput(iso: string | null | undefined): string {
   return iso ? new Date(iso).toISOString().slice(0, 10) : "";
 }
 
-export function AdminAccounts({ plans, addons }: { plans: Plan[]; addons: Addon[] }) {
-  const t = useTranslations("Admin.accounts");
-  const tState = useTranslations("Billing.states");
-  const [query, setQuery] = useState("");
-  const [page, setPage] = useState(0);
-  const [rows, setRows] = useState<AdminAccountRow[]>([]);
-  const [total, setTotal] = useState(0);
-  const [pageSize, setPageSize] = useState(25);
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<AdminAccountRow | null>(null);
+/** The fields of a workspace the manage dialog reads and edits. */
+export type ManageableAccount = Pick<
+  AdminAccountRow,
+  "id" | "name" | "owner_email" | "subscription" | "suspended_at" | "addons" | "limit_overrides"
+>;
 
-  const load = useCallback(async (q: string, p: number) => {
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/admin/accounts?q=${encodeURIComponent(q)}&page=${p}`, { cache: "no-store" });
-      if (res.ok) {
-        const data = await res.json();
-        setRows(data.accounts);
-        setTotal(data.total);
-        setPageSize(data.page_size);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    const id = setTimeout(() => void load(query, page), 250);
-    return () => clearTimeout(id);
-  }, [query, page, load]);
-
-  const planName = (code: string | undefined) => plans.find((p) => p.code === code)?.name ?? code ?? "—";
-
-  return (
-    <div>
-      <SettingsPanelHead title={t("title")} description={t("description", { count: total })} />
-      <div className="relative mb-3 max-w-sm">
-        <Search className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-        <Input
-          className="pl-8"
-          placeholder={t("search")}
-          value={query}
-          onChange={(e) => {
-            setQuery(e.target.value);
-            setPage(0);
-          }}
-        />
-      </div>
-      <Card>
-        <CardContent className="overflow-x-auto p-0">
-          <table className="w-full min-w-[760px] text-sm">
-            <thead className="border-b border-border text-left text-xs text-muted-foreground">
-              <tr>
-                <th className="px-4 py-2.5 font-medium">{t("workspace")}</th>
-                <th className="px-4 py-2.5 font-medium">{t("plan")}</th>
-                <th className="px-4 py-2.5 font-medium">{t("status")}</th>
-                <th className="px-4 py-2.5 font-medium">{t("renewsOrEnds")}</th>
-                <th className="px-4 py-2.5 font-medium">{t("usage")}</th>
-                <th className="px-4 py-2.5" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {loading && rows.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
-                    <Loader2 className="mx-auto size-4 animate-spin" />
-                  </td>
-                </tr>
-              ) : rows.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
-                    {t("empty")}
-                  </td>
-                </tr>
-              ) : (
-                rows.map((r) => {
-                  const state = (r.entitlements?.state ?? "unlimited") as BillingState;
-                  const ends = r.subscription?.status === "trialing" ? r.subscription.trial_ends_at : r.subscription?.current_period_end;
-                  return (
-                    <tr key={r.id}>
-                      <td className="px-4 py-3">
-                        <p className="font-medium text-foreground">
-                          {r.name}
-                          {r.is_demo ? (
-                            <Badge variant="outline" className="ml-2">
-                              {t("demo")}
-                            </Badge>
-                          ) : null}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {r.owner_email ?? "—"} · {t("since", { date: fmtDate(r.created_at) })}
-                        </p>
-                      </td>
-                      <td className="px-4 py-3">
-                        {planName(r.subscription?.plan_code)}
-                        {r.subscription?.billing_interval ? (
-                          <span className="text-xs text-muted-foreground"> · {r.subscription.billing_interval}</span>
-                        ) : null}
-                      </td>
-                      <td className="px-4 py-3">
-                        <Badge variant={isReadOnlyState(state) || state === "past_due" ? "destructive" : "secondary"}>
-                          {tState(state)}
-                        </Badge>
-                      </td>
-                      <td className="px-4 py-3 text-muted-foreground">{fmtDate(ends)}</td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground tabular-nums">
-                        {t("usageLine", {
-                          seats: r.entitlements?.usage.seats ?? 0,
-                          contacts: r.entitlements?.usage.contacts ?? 0,
-                        })}
-                      </td>
-                      <td className="px-4 py-3 text-right">
-                        <Button size="sm" variant="outline" onClick={() => setEditing(r)}>
-                          {t("manage")}
-                        </Button>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
-        </CardContent>
-      </Card>
-      {total > pageSize ? (
-        <div className="mt-3 flex items-center justify-end gap-2 text-sm">
-          <Button size="sm" variant="outline" disabled={page === 0} onClick={() => setPage((p) => p - 1)}>
-            {t("prev")}
-          </Button>
-          <span className="text-muted-foreground">
-            {t("pageOf", { page: page + 1, pages: Math.ceil(total / pageSize) })}
-          </span>
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={(page + 1) * pageSize >= total}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            {t("next")}
-          </Button>
-        </div>
-      ) : null}
-
-      {editing ? (
-        <ManageAccountDialog
-          row={editing}
-          plans={plans}
-          addons={addons}
-          onClose={() => setEditing(null)}
-          onSaved={() => {
-            setEditing(null);
-            void load(query, page);
-          }}
-        />
-      ) : null}
-    </div>
-  );
-}
-
-function ManageAccountDialog({
+export function ManageAccountDialog({
   row,
   plans,
   addons,
   onClose,
   onSaved,
 }: {
-  row: AdminAccountRow;
+  row: ManageableAccount;
   plans: Plan[];
   addons: Addon[];
   onClose: () => void;
