@@ -10,9 +10,12 @@ import {
 import {
   annualMonthlyEquivalent,
   annualSavingPercent,
+  chargePaise,
   daysUntil,
+  finalPriceInr,
   isReadOnlyState,
   parsePlanLimitError,
+  taxSettingsOf,
   usageRatio,
   withTaxPaise,
 } from './types';
@@ -69,6 +72,21 @@ describe('pricing helpers', () => {
   it('adds GST and converts to paise', () => {
     expect(withTaxPaise(1999, 18)).toBe(235882);
     expect(withTaxPaise(4999, 0)).toBe(499900);
+  });
+
+  it('charges GST on top or treats the price as GST-inclusive', () => {
+    expect(chargePaise(4999, { gstPercent: 18, pricesIncludeGst: false })).toBe(589882);
+    expect(chargePaise(4999, { gstPercent: 18, pricesIncludeGst: true })).toBe(499900);
+    expect(finalPriceInr(4999, { gstPercent: 18, pricesIncludeGst: false })).toBe(5898.82);
+    expect(finalPriceInr(4999, { gstPercent: 18, pricesIncludeGst: true })).toBe(4999);
+  });
+
+  it('reads tax settings with safe defaults', () => {
+    expect(taxSettingsOf(null)).toEqual({ gstPercent: 18, pricesIncludeGst: false });
+    expect(taxSettingsOf({ gst_percent: '12.00', prices_include_gst: true })).toEqual({
+      gstPercent: 12,
+      pricesIncludeGst: true,
+    });
   });
 
   it('derives the annual monthly equivalent and saving', () => {

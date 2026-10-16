@@ -2866,7 +2866,10 @@
       "currentPlan": "현재 요금제",
       "switchInterval": "결제 주기 변경",
       "choose": "{plan} 선택",
-      "annualNote": "연간 요금제는 12개월분을 한 번에 결제하며 자동 갱신되지 않습니다. WhatsApp 메시지 요금은 Meta가 별도로 청구합니다."
+      "annualNote": "연간 요금제는 12개월분을 한 번에 결제하며 자동 갱신되지 않습니다. WhatsApp 메시지 요금은 Meta가 별도로 청구합니다.",
+      "inclGst": "GST {percent}% 포함",
+      "totalMonthly": "GST 포함 월 {amount} 결제",
+      "totalYearly": "GST 포함 연 {amount} 결제"
     },
     "states": {
       "unlimited": "무제한",
@@ -2953,7 +2956,9 @@
       "added": "{addon}이(가) 추가되었습니다.",
       "processing": "결제가 접수되었습니다. 잠시 후 추가 기능이 표시됩니다.",
       "failed": "추가 기능을 변경할 수 없습니다.",
-      "checkoutDescription": "{addon} × {quantity} (월간)"
+      "checkoutDescription": "{addon} × {quantity} (월간)",
+      "inclGst": "GST {percent}% 포함",
+      "withGst": "GST {percent}% 포함 {amount}"
     }
   },
   "Admin": {
@@ -2984,7 +2989,12 @@
       "razorpayKeys": "Razorpay API 키",
       "razorpayWebhook": "Razorpay 웹훅 시크릿",
       "save": "설정 저장",
-      "configurePayments": "결제 설정 →"
+      "configurePayments": "결제 설정 →",
+      "priceTax": "요금제·부가 기능 가격",
+      "priceTaxExclusive": "가격에 GST 미포함",
+      "priceTaxInclusive": "가격에 GST 포함",
+      "priceTaxExample": "정가 {price} → 고객 결제액 {charged}",
+      "priceTaxHint": "이 설정이나 GST %를 바꾸면 새 결제부터 적용되며, 기존 구독자는 요금제를 바꿀 때까지 현재 금액을 유지합니다."
     },
     "plans": {
       "title": "요금제",

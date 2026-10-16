@@ -2866,7 +2866,10 @@
       "currentPlan": "Current plan",
       "switchInterval": "Switch billing period",
       "choose": "Choose {plan}",
-      "annualNote": "Annual plans are a single payment for 12 months and don't auto-renew. Meta's WhatsApp message charges are billed by Meta separately."
+      "annualNote": "Annual plans are a single payment for 12 months and don't auto-renew. Meta's WhatsApp message charges are billed by Meta separately.",
+      "inclGst": "incl. {percent}% GST",
+      "totalMonthly": "You pay {amount}/month incl. GST",
+      "totalYearly": "You pay {amount}/year incl. GST"
     },
     "states": {
       "unlimited": "Unlimited",
@@ -2953,7 +2956,9 @@
       "added": "{addon} added.",
       "processing": "Payment received — the add-on will appear in a minute.",
       "failed": "Could not update the add-on.",
-      "checkoutDescription": "{addon} × {quantity} (monthly)"
+      "checkoutDescription": "{addon} × {quantity} (monthly)",
+      "inclGst": "incl. {percent}% GST",
+      "withGst": "{amount} incl. {percent}% GST"
     }
   },
   "Admin": {
@@ -2984,7 +2989,12 @@
       "razorpayKeys": "Razorpay API keys",
       "razorpayWebhook": "Razorpay webhook secret",
       "save": "Save settings",
-      "configurePayments": "Set up payments →"
+      "configurePayments": "Set up payments →",
+      "priceTax": "Plan & add-on prices",
+      "priceTaxExclusive": "Prices exclude GST",
+      "priceTaxInclusive": "Prices include GST",
+      "priceTaxExample": "{price} list price → customer pays {charged}",
+      "priceTaxHint": "Changing this or the GST % applies to new checkouts; existing subscribers keep their current amount until they switch plans."
     },
     "plans": {
       "title": "Plans",

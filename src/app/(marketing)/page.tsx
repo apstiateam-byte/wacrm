@@ -38,7 +38,8 @@ import { ProductPreview } from "@/components/marketing/product-preview";
 import { demoEnabled } from "@/lib/demo/server";
 import { PricingTable } from "@/components/marketing/pricing-table";
 import { createClient } from "@/lib/supabase/server";
-import type { Plan } from "@/lib/billing/types";
+import { taxSettingsOf, type Plan, type TaxSettings } from "@/lib/billing/types";
+import { supabaseAdmin } from "@/lib/flows/admin-client";
 
 const ICONS: Record<(typeof features)[number]["icon"], LucideIcon> = {
   inbox: MessageSquare,
@@ -52,19 +53,23 @@ const ICONS: Record<(typeof features)[number]["icon"], LucideIcon> = {
 };
 
 /** Live plan catalogue (edited in /admin). Empty when unavailable. */
-async function loadPlans(): Promise<{ plans: Plan[]; gstPercent: number }> {
+async function loadPlans(): Promise<{ plans: Plan[]; tax: TaxSettings }> {
   try {
     const supabase = await createClient();
-    const { data } = await supabase
-      .from("plans")
-      .select("code, name, description, sort_order, is_public, is_active, highlighted, contact_sales, price_inr_monthly, price_inr_annual, limits, features")
-      .eq("is_active", true)
-      .eq("is_public", true)
-      .order("sort_order");
-    // Anonymous visitors can't read platform_settings; 18% GST is the default.
-    return { plans: (data ?? []) as Plan[], gstPercent: 18 };
+    const [{ data }, { data: settings }] = await Promise.all([
+      supabase
+        .from("plans")
+        .select("code, name, description, sort_order, is_public, is_active, highlighted, contact_sales, price_inr_monthly, price_inr_annual, limits, features")
+        .eq("is_active", true)
+        .eq("is_public", true)
+        .order("sort_order"),
+      // Anonymous visitors can't read platform_settings; read it
+      // server-side and pass only the tax treatment to the page.
+      supabaseAdmin().from("platform_settings").select("*").eq("id", true).maybeSingle(),
+    ]);
+    return { plans: (data ?? []) as Plan[], tax: taxSettingsOf(settings) };
   } catch {
-    return { plans: [], gstPercent: 18 };
+    return { plans: [], tax: taxSettingsOf(null) };
   }
 }
 
@@ -86,7 +91,7 @@ export default async function LandingPage() {
   // Self-hosted / internal installs skip the public site entirely.
   if (!marketingSiteEnabled()) redirect("/dashboard");
   const live = demoEnabled();
-  const { plans, gstPercent } = await loadPlans();
+  const { plans, tax } = await loadPlans();
 
   // Bento layout: one wide and one tall card first, then regular ones.
   const [f0, f1, f2, f3, ...rest] = features;
@@ -239,7 +244,7 @@ export default async function LandingPage() {
             <PricingTable
               plans={plans}
               addons={[]}
-              gstPercent={gstPercent}
+              tax={tax}
               salesHref={brand.salesUrl || `mailto:${brand.supportEmail}`}
               compact
             />

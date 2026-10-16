@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 
 import { createClient } from "@/lib/supabase/server";
 import { brand, faqs } from "@/content/marketing";
-import type { Addon, Plan } from "@/lib/billing/types";
+import { taxSettingsOf, type Addon, type Plan } from "@/lib/billing/types";
+import { supabaseAdmin } from "@/lib/flows/admin-client";
 import { PricingTable } from "@/components/marketing/pricing-table";
 
 export const metadata: Metadata = {
@@ -23,8 +24,9 @@ export default async function PricingPage() {
       .eq("is_public", true)
       .order("sort_order"),
     supabase.from("addons").select("*").eq("is_active", true).order("price_inr_monthly"),
-    // Anonymous visitors can't read platform_settings (RLS); fall back to 18%.
-    supabase.from("platform_settings").select("gst_percent").eq("id", true).maybeSingle(),
+    // Anonymous visitors can't read platform_settings; read it server-side
+    // and pass only the tax treatment to the page.
+    supabaseAdmin().from("platform_settings").select("*").eq("id", true).maybeSingle(),
   ]);
 
   return (
@@ -39,7 +41,7 @@ export default async function PricingPage() {
       <PricingTable
         plans={(plans ?? []) as Plan[]}
         addons={(addons ?? []) as Addon[]}
-        gstPercent={Number(settings?.gst_percent ?? 18)}
+        tax={taxSettingsOf(settings)}
         salesHref={brand.salesUrl || `mailto:${brand.supportEmail}`}
       />
 

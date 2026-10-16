@@ -10,12 +10,14 @@ import { formatInr } from "@/lib/billing/razorpay-checkout";
 import {
   annualMonthlyEquivalent,
   annualSavingPercent,
+  finalPriceInr,
   LIMIT_KEYS,
   type Addon,
   type BillingInterval,
   type FeatureKey,
   type LimitKey,
   type Plan,
+  type TaxSettings,
 } from "@/lib/billing/types";
 
 // The public site is English (see src/content/marketing.ts), so labels
@@ -56,13 +58,13 @@ function limitText(plan: Plan, key: LimitKey): string {
 export function PricingTable({
   plans,
   addons,
-  gstPercent,
+  tax,
   salesHref,
   compact = false,
 }: {
   plans: Plan[];
   addons: Addon[];
-  gstPercent: number;
+  tax: TaxSettings;
   salesHref: string;
   /** Landing-page version: plan cards only (no comparison table / add-ons). */
   compact?: boolean;
@@ -96,6 +98,11 @@ export function PricingTable({
       <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
         {plans.map((plan) => {
           const monthly = interval === "monthly" ? plan.price_inr_monthly : annualMonthlyEquivalent(plan);
+          const listPrice = interval === "monthly" ? plan.price_inr_monthly : plan.price_inr_annual;
+          const charged =
+            !tax.pricesIncludeGst && tax.gstPercent > 0 && listPrice != null && !plan.contact_sales
+              ? finalPriceInr(listPrice, tax)
+              : null;
           return (
             <div
               key={plan.code}
@@ -124,8 +131,17 @@ export function PricingTable({
                       {interval === "annual" && plan.price_inr_annual != null
                         ? `${formatInr(plan.price_inr_annual)} billed yearly`
                         : "Billed monthly"}
-                      {gstPercent > 0 ? ` · +${gstPercent}% GST` : ""}
+                      {tax.gstPercent > 0
+                        ? tax.pricesIncludeGst
+                          ? ` · incl. ${tax.gstPercent}% GST`
+                          : ` · +${tax.gstPercent}% GST`
+                        : ""}
                     </p>
+                    {charged != null ? (
+                      <p className="mt-0.5 text-xs font-medium">
+                        You pay {formatInr(charged)}/{interval === "annual" ? "year" : "month"} incl. GST
+                      </p>
+                    ) : null}
                   </>
                 )}
               </div>
@@ -227,6 +243,13 @@ export function PricingTable({
                   {formatInr(a.price_inr_monthly)}
                   <span className="text-sm font-normal text-muted-foreground">/month</span>
                 </p>
+                {tax.gstPercent > 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    {tax.pricesIncludeGst
+                      ? `incl. ${tax.gstPercent}% GST`
+                      : `${formatInr(finalPriceInr(a.price_inr_monthly, tax))} incl. ${tax.gstPercent}% GST`}
+                  </p>
+                ) : null}
               </div>
             ))}
           </div>

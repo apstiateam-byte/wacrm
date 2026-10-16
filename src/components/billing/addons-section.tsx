@@ -14,7 +14,7 @@ import {
   openRazorpayCheckout,
   type CheckoutSession,
 } from "@/lib/billing/razorpay-checkout";
-import type { BillingSummary } from "@/lib/billing/types";
+import { finalPriceInr, type BillingSummary } from "@/lib/billing/types";
 import { APP_NAME } from "@/lib/brand";
 
 const BUSINESS_NAME = APP_NAME;
@@ -113,6 +113,18 @@ export function AddonsSection({
               <p className="text-sm">
                 <span className="font-semibold">{formatInr(a.price_inr_monthly)}</span>
                 <span className="text-muted-foreground"> {t("perUnit")}</span>
+                {summary.gst_percent > 0 ? (
+                  <span className="block text-xs text-muted-foreground">
+                    {summary.prices_include_gst
+                      ? t("inclGst", { percent: summary.gst_percent })
+                      : t("withGst", {
+                          amount: formatInr(
+                            finalPriceInr(a.price_inr_monthly, { gstPercent: summary.gst_percent, pricesIncludeGst: false }),
+                          ),
+                          percent: summary.gst_percent,
+                        })}
+                  </span>
+                ) : null}
               </p>
               {mine?.managed ? (
                 <p className="text-xs text-muted-foreground">{t("managed")}</p>

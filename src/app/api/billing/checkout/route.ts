@@ -9,8 +9,10 @@
 //             and its id cached on `plans.razorpay_plan_id_monthly`.
 //   annual  → one-time Razorpay Order for 12 months.
 //
-// Prices are stored exclusive of GST; the charged amount adds
-// `platform_settings.gst_percent`. Nothing is activated here — the
+// Prices are stored exclusive of GST (the charged amount adds
+// `platform_settings.gst_percent`) unless `prices_include_gst` is on,
+// in which case they're charged as-is. `select('*')` keeps checkout
+// working on a database without migration 051. Nothing is activated here — the
 // verify callback / webhook does that once Razorpay confirms payment.
 // ============================================================
 
@@ -27,7 +29,7 @@ import {
   razorpayCredentials,
   RazorpayError,
 } from '@/lib/billing/razorpay';
-import { withTaxPaise, type BillingInterval } from '@/lib/billing/types';
+import { chargePaise, taxSettingsOf, type BillingInterval } from '@/lib/billing/types';
 import { checkRateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { getT } from '@/lib/i18n/translate';
 
@@ -63,7 +65,7 @@ export async function POST(request: Request) {
         .select('code, name, is_public, is_active, contact_sales, price_inr_monthly, price_inr_annual, razorpay_plan_id_monthly')
         .eq('code', body.plan_code)
         .maybeSingle(),
-      db.from('platform_settings').select('billing_enabled, gst_percent').eq('id', true).maybeSingle(),
+      db.from('platform_settings').select('*').eq('id', true).maybeSingle(),
       db
         .from('accounts')
         .select('name, billing_email, billing_name')
@@ -79,8 +81,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: t('invalidPlan') }, { status: 400 });
     }
 
-    const gst = Number(settings.gst_percent ?? 18);
-    const amountPaise = withTaxPaise(price, gst);
+    const tax = taxSettingsOf(settings);
+    const gst = tax.gstPercent;
+    const amountPaise = chargePaise(price, tax);
     const notes = {
       account_id: ctx.accountId,
       plan_code: plan.code,

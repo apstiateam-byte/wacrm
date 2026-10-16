@@ -136,14 +136,34 @@ export async function PATCH(request: Request) {
       const s = body.settings;
       const patch: Record<string, unknown> = {};
       if (typeof s.billing_enabled === 'boolean') patch.billing_enabled = s.billing_enabled;
+      if (typeof s.prices_include_gst === 'boolean') patch.prices_include_gst = s.prices_include_gst;
       for (const [key, max] of [['trial_days', 365], ['grace_days', 90], ['gst_percent', 100]] as const) {
         const v = intOrNull(s[key]);
         if (v != null && v <= max) patch[key] = v;
       }
       if (Object.keys(patch).length) {
+        const { data: before } = await db
+          .from('platform_settings')
+          .select('*')
+          .eq('id', true)
+          .maybeSingle();
         patch.updated_at = new Date().toISOString();
         const { error } = await db.from('platform_settings').update(patch).eq('id', true);
         if (error) throw error;
+        // The charged amount changed — cached Razorpay plans hold the old
+        // amount (they're immutable), so checkout must create new ones.
+        // Existing subscribers stay on their old amount until they switch.
+        const taxChanged =
+          ('gst_percent' in patch && Number(before?.gst_percent) !== patch.gst_percent) ||
+          ('prices_include_gst' in patch && (before?.prices_include_gst === true) !== patch.prices_include_gst);
+        if (taxChanged) {
+          const [plansReset, addonsReset] = await Promise.all([
+            db.from('plans').update({ razorpay_plan_id_monthly: null }).not('razorpay_plan_id_monthly', 'is', null),
+            db.from('addons').update({ razorpay_plan_id: null }).not('razorpay_plan_id', 'is', null),
+          ]);
+          if (plansReset.error) throw plansReset.error;
+          if (addonsReset.error) throw addonsReset.error;
+        }
       }
     }
 

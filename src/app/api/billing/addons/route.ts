@@ -25,7 +25,7 @@ import {
   razorpayCredentials,
   RazorpayError,
 } from '@/lib/billing/razorpay';
-import { withTaxPaise } from '@/lib/billing/types';
+import { chargePaise, taxSettingsOf } from '@/lib/billing/types';
 import { checkRateLimit, rateLimitResponse, RATE_LIMITS } from '@/lib/rate-limit';
 import { getT } from '@/lib/i18n/translate';
 
@@ -56,13 +56,14 @@ export async function POST(request: Request) {
 
     const [{ data: addon }, { data: settings }, { data: account }] = await Promise.all([
       db.from('addons').select('*').eq('code', body.addon_code).eq('is_active', true).maybeSingle(),
-      db.from('platform_settings').select('gst_percent').eq('id', true).maybeSingle(),
+      db.from('platform_settings').select('*').eq('id', true).maybeSingle(),
       db.from('accounts').select('name, billing_email, billing_name').eq('id', ctx.accountId).maybeSingle(),
     ]);
     if (!addon) return NextResponse.json({ error: t('invalidAddon') }, { status: 400 });
 
-    const gst = Number(settings?.gst_percent ?? 18);
-    const unitPaise = withTaxPaise(addon.price_inr_monthly as number, gst);
+    const tax = taxSettingsOf(settings);
+    const gst = tax.gstPercent;
+    const unitPaise = chargePaise(addon.price_inr_monthly as number, tax);
 
     let planId = addon.razorpay_plan_id as string | null;
     if (!planId) {

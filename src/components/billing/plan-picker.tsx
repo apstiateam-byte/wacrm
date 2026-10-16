@@ -11,6 +11,7 @@ import { formatInr } from "@/lib/billing/razorpay-checkout";
 import {
   annualMonthlyEquivalent,
   annualSavingPercent,
+  finalPriceInr,
   type BillingInterval,
   type FeatureKey,
   type LimitKey,
@@ -33,6 +34,8 @@ export interface PlanPickerProps {
   currentIsPaid: boolean;
   currentInterval: BillingInterval | null;
   gstPercent: number;
+  /** List prices already include GST (charged as-is). */
+  pricesIncludeGst: boolean;
   canPurchase: boolean;
   /** Plan code + interval currently going through checkout. */
   busy: string | null;
@@ -86,6 +89,12 @@ export function PlanPicker(props: PlanPickerProps) {
           const monthly =
             interval === "monthly" ? plan.price_inr_monthly : annualMonthlyEquivalent(plan);
           const busyKey = `${plan.code}:${interval}`;
+          // GST added on top: show the amount actually charged too.
+          const listPrice = interval === "monthly" ? plan.price_inr_monthly : plan.price_inr_annual;
+          const charged =
+            !props.pricesIncludeGst && props.gstPercent > 0 && listPrice != null && !plan.contact_sales
+              ? finalPriceInr(listPrice, { gstPercent: props.gstPercent, pricesIncludeGst: false })
+              : null;
           return (
             <div
               key={plan.code}
@@ -115,8 +124,17 @@ export function PlanPicker(props: PlanPickerProps) {
                       {interval === "annual" && plan.price_inr_annual != null
                         ? t("billedYearly", { amount: formatInr(plan.price_inr_annual) })
                         : t("billedMonthly")}
-                      {props.gstPercent > 0 ? ` · ${t("plusGst", { percent: props.gstPercent })}` : ""}
+                      {props.gstPercent > 0
+                        ? ` · ${t(props.pricesIncludeGst ? "inclGst" : "plusGst", { percent: props.gstPercent })}`
+                        : ""}
                     </p>
+                    {charged != null ? (
+                      <p className="mt-0.5 text-xs font-medium text-foreground">
+                        {interval === "annual"
+                          ? t("totalYearly", { amount: formatInr(charged) })
+                          : t("totalMonthly", { amount: formatInr(charged) })}
+                      </p>
+                    ) : null}
                   </>
                 )}
               </div>

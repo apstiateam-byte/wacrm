@@ -89,6 +89,8 @@ export function formatInr(amount: number): string {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
     currency: 'INR',
-    maximumFractionDigits: 0,
+    // Whole rupees stay whole; GST-added totals show paise (₹5,898.82).
+    minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+    maximumFractionDigits: Number.isInteger(amount) ? 0 : 2,
   }).format(amount);
 }

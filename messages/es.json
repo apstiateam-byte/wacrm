@@ -2866,7 +2866,10 @@
       "currentPlan": "Plan actual",
       "switchInterval": "Cambiar período de facturación",
       "choose": "Elegir {plan}",
-      "annualNote": "Los planes anuales son un pago único por 12 meses y no se renuevan automáticamente. Meta factura aparte las tarifas de mensajes de WhatsApp."
+      "annualNote": "Los planes anuales son un pago único por 12 meses y no se renuevan automáticamente. Meta factura aparte las tarifas de mensajes de WhatsApp.",
+      "inclGst": "incl. {percent}% GST",
+      "totalMonthly": "Pagas {amount}/mes con GST",
+      "totalYearly": "Pagas {amount}/año con GST"
     },
     "states": {
       "unlimited": "Ilimitado",
@@ -2953,7 +2956,9 @@
       "added": "{addon} añadido.",
       "processing": "Pago recibido: el complemento aparecerá en un momento.",
       "failed": "No se pudo actualizar el complemento.",
-      "checkoutDescription": "{addon} × {quantity} (mensual)"
+      "checkoutDescription": "{addon} × {quantity} (mensual)",
+      "inclGst": "incl. {percent}% GST",
+      "withGst": "{amount} con {percent}% GST"
     }
   },
   "Admin": {
@@ -2984,7 +2989,12 @@
       "razorpayKeys": "Claves de API de Razorpay",
       "razorpayWebhook": "Secreto del webhook de Razorpay",
       "save": "Guardar configuración",
-      "configurePayments": "Configurar pagos →"
+      "configurePayments": "Configurar pagos →",
+      "priceTax": "Precios de planes y complementos",
+      "priceTaxExclusive": "Precios sin GST",
+      "priceTaxInclusive": "Precios con GST incluido",
+      "priceTaxExample": "Precio de lista {price} → el cliente paga {charged}",
+      "priceTaxHint": "Cambiar esto o el % de GST se aplica a nuevos pagos; los suscriptores actuales mantienen su importe hasta cambiar de plan."
     },
     "plans": {
       "title": "Planes",

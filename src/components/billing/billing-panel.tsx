@@ -219,6 +219,7 @@ export function BillingPanel() {
           currentIsPaid={isPaid}
           currentInterval={sub?.billing_interval ?? null}
           gstPercent={summary.gst_percent}
+          pricesIncludeGst={summary.prices_include_gst}
           canPurchase={canEditSettings && summary.checkout_available && ent.state !== "suspended"}
           busy={busy}
           onChoose={choose}

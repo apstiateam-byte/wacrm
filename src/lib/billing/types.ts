@@ -112,6 +112,7 @@ export interface BillingSummary {
   billing_enabled: boolean;
   checkout_available: boolean;
   gst_percent: number;
+  prices_include_gst: boolean;
   entitlements: Entitlements;
   subscription: Subscription | null;
   plans: Plan[];
@@ -161,6 +162,33 @@ export function annualSavingPercent(
 /** Price including tax, in paise (Razorpay's unit). */
 export function withTaxPaise(priceInr: number, gstPercent: number): number {
   return Math.round(priceInr * (1 + gstPercent / 100) * 100);
+}
+
+/** How list prices are taxed (`platform_settings`). */
+export interface TaxSettings {
+  gstPercent: number;
+  /** List prices already include GST and are charged as-is. */
+  pricesIncludeGst: boolean;
+}
+
+/** What the customer is charged for a list price, in paise. */
+export function chargePaise(priceInr: number, tax: TaxSettings): number {
+  return tax.pricesIncludeGst ? Math.round(priceInr * 100) : withTaxPaise(priceInr, tax.gstPercent);
+}
+
+/** What the customer is charged for a list price, in rupees. */
+export function finalPriceInr(priceInr: number, tax: TaxSettings): number {
+  return chargePaise(priceInr, tax) / 100;
+}
+
+/** Reads the tax columns of a `platform_settings` row (defaults: 18%, exclusive). */
+export function taxSettingsOf(
+  row: { gst_percent?: unknown; prices_include_gst?: unknown } | null | undefined,
+): TaxSettings {
+  return {
+    gstPercent: Number(row?.gst_percent ?? 18),
+    pricesIncludeGst: row?.prices_include_gst === true,
+  };
 }
 
 /** Usage ratio 0..1 for a meter; null when unlimited. */

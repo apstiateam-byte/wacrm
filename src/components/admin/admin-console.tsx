@@ -20,7 +20,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { SettingsPanelHead } from "@/components/settings/settings-panel-head";
 import { formatInr } from "@/lib/billing/razorpay-checkout";
-import { FEATURE_KEYS, LIMIT_KEYS, type Addon, type Plan } from "@/lib/billing/types";
+import { cn } from "@/lib/utils";
+import { FEATURE_KEYS, LIMIT_KEYS, finalPriceInr, type Addon, type Plan } from "@/lib/billing/types";
 import { AdminAccounts } from "./admin-accounts";
 import { PaymentsCard, type PaymentsInfo } from "./payments-card";
 
@@ -29,6 +30,7 @@ interface PlatformSettings {
   trial_days: number;
   grace_days: number;
   gst_percent: number;
+  prices_include_gst?: boolean;
 }
 
 interface AdminOverview {
@@ -121,6 +123,9 @@ function StatusDot({ ok, label }: { ok: boolean; label: string }) {
   );
 }
 
+/** Sample list price for the GST-treatment preview. */
+const PRICE_TAX_EXAMPLE = 4999;
+
 function PlatformSettingsCard({ data, onSaved }: { data: AdminOverview; onSaved: () => Promise<void> }) {
   const t = useTranslations("Admin.settings");
   const [form, setForm] = useState<PlatformSettings>(data.settings);
@@ -145,7 +150,7 @@ function PlatformSettingsCard({ data, onSaved }: { data: AdminOverview; onSaved:
     }
   }
 
-  const num = (key: keyof Omit<PlatformSettings, "billing_enabled">) => (
+  const num = (key: "trial_days" | "grace_days" | "gst_percent") => (
     <div className="space-y-1.5">
       <Label htmlFor={`ps-${key}`}>{t(key)}</Label>
       <Input
@@ -178,6 +183,39 @@ function PlatformSettingsCard({ data, onSaved }: { data: AdminOverview; onSaved:
             {num("trial_days")}
             {num("grace_days")}
             {num("gst_percent")}
+          </div>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-foreground">{t("priceTax")}</p>
+            <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label={t("priceTax")}>
+              {([false, true] as const).map((inclusive) => {
+                const tax = { gstPercent: form.gst_percent, pricesIncludeGst: inclusive };
+                const selected = (form.prices_include_gst === true) === inclusive;
+                return (
+                  <button
+                    key={String(inclusive)}
+                    type="button"
+                    role="radio"
+                    aria-checked={selected}
+                    onClick={() => setForm((f) => ({ ...f, prices_include_gst: inclusive }))}
+                    className={cn(
+                      "rounded-lg border p-3 text-left transition-colors",
+                      selected ? "border-primary bg-primary/5 ring-1 ring-primary/30" : "border-border hover:bg-muted/40",
+                    )}
+                  >
+                    <span className="block text-sm font-medium text-foreground">
+                      {inclusive ? t("priceTaxInclusive") : t("priceTaxExclusive")}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-muted-foreground">
+                      {t("priceTaxExample", {
+                        price: formatInr(PRICE_TAX_EXAMPLE),
+                        charged: formatInr(finalPriceInr(PRICE_TAX_EXAMPLE, tax)),
+                      })}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">{t("priceTaxHint")}</p>
           </div>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
             <StatusDot ok={data.razorpay_configured} label={t("razorpayKeys")} />

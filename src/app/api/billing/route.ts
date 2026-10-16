@@ -36,7 +36,7 @@ export async function GET() {
 
     const [settings, entitlements, subscription, plans, addons, accountAddons, payments, account, platformAdmin] =
       await Promise.all([
-        db.from('platform_settings').select('billing_enabled, gst_percent').eq('id', true).maybeSingle(),
+        db.from('platform_settings').select('*').eq('id', true).maybeSingle(),
         // A database without migration 047 has no billing functions —
         // report "billing off" (unlimited) instead of failing the app.
         getEntitlements(ctx.accountId, db).catch((err: { message?: string }) => {
@@ -87,6 +87,7 @@ export async function GET() {
       billing_enabled: settings.data?.billing_enabled === true && entitlements.state !== 'unlimited',
       checkout_available: (await razorpayCredentials()) !== null,
       gst_percent: Number(settings.data?.gst_percent ?? 18),
+      prices_include_gst: settings.data?.prices_include_gst === true,
       entitlements,
       subscription: subscription.data ?? null,
       plans: plans.data ?? [],
