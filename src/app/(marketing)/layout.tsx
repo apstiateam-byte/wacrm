@@ -21,7 +21,6 @@ export const metadata: Metadata = {
 
 const NAV = [
   { href: "/#features", label: "Product" },
-  ...niches.map((n) => ({ href: `/${n.slug}`, label: n.navLabel })),
   { href: "/#pricing", label: "Pricing" },
   { href: "/demo", label: "Demo" },
   { href: "/#contact", label: "Contact" },
@@ -105,7 +104,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
             <LogoMark size={28} />
             {brand.name}
           </Link>
-          <nav className="hidden items-center gap-1 text-sm lg:flex" aria-label="Main">
+          <nav className="hidden items-center gap-1 text-sm md:flex" aria-label="Main">
             {NAV.map((item) => (
               <Link
                 key={item.href}
@@ -133,7 +132,7 @@ export default async function MarketingLayout({ children }: { children: React.Re
             )}
           </div>
         </div>
-        <nav className="flex gap-1 overflow-x-auto px-3 pb-2 text-sm lg:hidden" aria-label="Main mobile">
+        <nav className="flex gap-1 overflow-x-auto px-3 pb-2 text-sm md:hidden" aria-label="Main mobile">
           {NAV.map((item) => (
             <Link key={item.href} href={item.href} className="shrink-0 rounded-md px-2.5 py-1 text-muted-foreground hover:bg-muted hover:text-foreground">
               {item.label}
