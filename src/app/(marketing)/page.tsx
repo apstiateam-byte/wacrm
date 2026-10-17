@@ -5,7 +5,6 @@ import {
   Bot,
   Braces,
   Check,
-  ChevronDown,
   GitBranch,
   Mail,
   MessageSquare,
@@ -37,9 +36,8 @@ import { FeatureTabs } from "@/components/marketing/feature-tabs";
 import { ProductPreview } from "@/components/marketing/product-preview";
 import { demoEnabled } from "@/lib/demo/server";
 import { PricingTable } from "@/components/marketing/pricing-table";
-import { createClient } from "@/lib/supabase/server";
-import { taxSettingsOf, type Plan, type TaxSettings } from "@/lib/billing/types";
-import { supabaseAdmin } from "@/lib/flows/admin-client";
+import { ctaLg, FaqList, gridTexture, PricingFallback, SectionHead, Spotlight } from "@/components/marketing/sections";
+import { gstAnswer, loadPlans } from "@/lib/marketing/plans";
 
 const ICONS: Record<(typeof features)[number]["icon"], LucideIcon> = {
   inbox: MessageSquare,
@@ -52,54 +50,6 @@ const ICONS: Record<(typeof features)[number]["icon"], LucideIcon> = {
   api: Braces,
 };
 
-/** Live plan catalogue (edited in /admin). Empty when unavailable. */
-async function loadPlans(): Promise<{ plans: Plan[]; tax: TaxSettings }> {
-  try {
-    const supabase = await createClient();
-    const [{ data }, { data: settings }] = await Promise.all([
-      supabase
-        .from("plans")
-        .select("code, name, description, sort_order, is_public, is_active, highlighted, contact_sales, price_inr_monthly, price_inr_annual, limits, features")
-        .eq("is_active", true)
-        .eq("is_public", true)
-        .order("sort_order"),
-      // Anonymous visitors can't read platform_settings; read it
-      // server-side and pass only the tax treatment to the page.
-      supabaseAdmin().from("platform_settings").select("*").eq("id", true).maybeSingle(),
-    ]);
-    return { plans: (data ?? []) as Plan[], tax: taxSettingsOf(settings) };
-  } catch {
-    return { plans: [], tax: taxSettingsOf(null) };
-  }
-}
-
-/** Large call-to-action buttons. */
-const ctaLg = "h-11 rounded-lg px-5 text-[15px]";
-
-/** Subtle grid texture used behind the hero and the closing CTA. */
-const gridTexture =
-  "pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,var(--color-border)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border)_1px,transparent_1px)] bg-[size:56px_56px]";
-
-function SectionHead({
-  eyebrow,
-  title,
-  subtitle,
-  align = "left",
-}: {
-  eyebrow: string;
-  title: string;
-  subtitle?: string;
-  align?: "left" | "center";
-}) {
-  return (
-    <div className={cn("max-w-2xl", align === "center" && "mx-auto text-center")}>
-      <p className="text-sm font-medium text-primary">{eyebrow}</p>
-      <h2 className="font-display mt-3 text-3xl text-balance sm:text-[2.6rem]">{title}</h2>
-      {subtitle ? <p className="mt-4 text-pretty text-muted-foreground sm:text-lg">{subtitle}</p> : null}
-    </div>
-  );
-}
-
 export default async function LandingPage() {
   // Self-hosted / internal installs skip the public site entirely.
   if (!marketingSiteEnabled()) redirect("/dashboard");
@@ -107,16 +57,7 @@ export default async function LandingPage() {
   const { plans, tax } = await loadPlans();
 
   // The GST answer follows the platform's actual pricing setting.
-  const faqItems = faqs.map((f) =>
-    f.q === "Do prices include GST?"
-      ? {
-          ...f,
-          a: tax.pricesIncludeGst
-            ? `Yes. Prices shown include ${tax.gstPercent}% GST, and a GST invoice is issued for every payment. Add your GSTIN to claim input tax credit.`
-            : `Prices are shown excluding GST. ${tax.gstPercent}% GST is added at checkout — the total is shown before you pay — and a GST invoice is issued for every payment. Add your GSTIN to claim input tax credit.`,
-        }
-      : f,
-  );
+  const faqItems = faqs.map((f) => (f.q === "Do prices include GST?" ? { ...f, a: gstAnswer(tax) } : f));
 
   return (
     <>
@@ -333,17 +274,7 @@ export default async function LandingPage() {
               .
             </p>
           </div>
-          <div className="border-b border-border">
-            {faqItems.map((f) => (
-              <details key={f.q} className="group border-t border-border">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 font-medium [&::-webkit-details-marker]:hidden">
-                  {f.q}
-                  <ChevronDown className="size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
-                </summary>
-                <p className="-mt-1 pb-5 text-sm leading-relaxed text-muted-foreground">{f.a}</p>
-              </details>
-            ))}
-          </div>
+          <FaqList items={faqItems} />
         </div>
       </section>
 
@@ -393,40 +324,6 @@ export default async function LandingPage() {
         </div>
       </section>
     </>
-  );
-}
-
-function Spotlight({
-  eyebrow,
-  title,
-  body,
-  points,
-  visual,
-  reverse = false,
-}: {
-  eyebrow: string;
-  title: string;
-  body: string;
-  points: string[];
-  visual: React.ReactNode;
-  reverse?: boolean;
-}) {
-  return (
-    <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-      <div className={cn("min-w-0", reverse && "lg:order-2")}>
-        <p className="text-sm font-medium text-primary">{eyebrow}</p>
-        <h3 className="font-display mt-3 text-2xl text-balance sm:text-4xl">{title}</h3>
-        <p className="mt-4 text-pretty text-muted-foreground">{body}</p>
-        <ul className="mt-6 space-y-2.5 text-sm">
-          {points.map((pt) => (
-            <li key={pt} className="flex items-center gap-2">
-              <Check className="size-4 shrink-0 text-primary" /> {pt}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className={cn("min-w-0 rounded-xl border border-border bg-background p-4 sm:p-6", reverse && "lg:order-1")}>{visual}</div>
-    </div>
   );
 }
 
@@ -529,25 +426,5 @@ function SecondaryCta({ live }: { live: boolean }) {
     <Link href="/demo" className={cn(buttonVariants({ variant: "outline", size: "lg" }), ctaLg)}>
       Book a demo
     </Link>
-  );
-}
-
-/** Shown when the plan catalogue can't be loaded (e.g. billing migration not applied yet). */
-function PricingFallback() {
-  return (
-    <div className="mt-12 grid items-center gap-8 rounded-2xl border border-border bg-card p-8 sm:p-12 lg:grid-cols-[1fr_auto]">
-      <ul className="grid gap-2.5 text-sm text-muted-foreground sm:grid-cols-2">
-        {["Plans from ₹1,999/month", "Save 20% with annual billing", "No markup on Meta message fees", "GST invoices for every payment"].map(
-          (item) => (
-            <li key={item} className="flex items-center gap-2">
-              <Check className="size-4 text-primary" /> {item}
-            </li>
-          ),
-        )}
-      </ul>
-      <Link href="/pricing" className={cn(buttonVariants({ size: "lg" }), ctaLg)}>
-        See pricing <ArrowRight className="size-4" />
-      </Link>
-    </div>
   );
 }

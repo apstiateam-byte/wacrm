@@ -12,12 +12,60 @@ import {
 
 import { cn } from "@/lib/utils";
 
+export type PreviewTone = "amber" | "emerald" | "sky";
+
+/** Sample data shown inside the mock-up. Must read as sample data. */
+export interface PreviewSample {
+  chats: { name: string; text: string; time: string; unread?: number; active?: boolean }[];
+  /** The open conversation, oldest first. */
+  messages: { from: "customer" | "business"; text: string }[];
+  /** Suggested next reply (AI draft or chatbot-flow step). */
+  suggestion: { label: string; text: string; kind: "ai" | "flow" };
+  contact: {
+    name: string;
+    subtitle: string;
+    tags: { label: string; tone: PreviewTone }[];
+    card: { label: string; title: string; value: string; stage: string };
+  };
+}
+
+const DEFAULT_SAMPLE: PreviewSample = {
+  chats: [
+    { name: "Priya Sharma", text: "Do you deliver to Pune by Friday?", time: "11m", unread: 2, active: true },
+    { name: "Aditya Verma", text: "We need GST invoices for B2B", time: "6m", unread: 3 },
+    { name: "Vikram Singh", text: "My order #4821 still shows…", time: "30m", unread: 1 },
+    { name: "Ananya Iyer", text: "Perfect, waiting for the quote", time: "1d" },
+    { name: "Arjun Nair", text: "Please send the invoice to accounts", time: "1d" },
+  ],
+  messages: [
+    { from: "customer", text: "Hi! Is the blue silk saree back in stock?" },
+    { from: "business", text: "Yes, it arrived this morning. Shall I reserve one for you?" },
+    { from: "customer", text: "Yes please! Do you deliver to Pune by Friday?" },
+  ],
+  suggestion: { kind: "ai", label: "AI draft", text: "“Yes — order by Wednesday for Friday delivery.”" },
+  contact: {
+    name: "Priya Sharma",
+    subtitle: "Sharma Boutique",
+    tags: [
+      { label: "VIP", tone: "amber" },
+      { label: "Repeat buyer", tone: "emerald" },
+    ],
+    card: { label: "Deal", title: "Wedding trousseau", value: "₹48,500", stage: "Negotiation" },
+  },
+};
+
+const TONES: Record<PreviewTone, string> = {
+  amber: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+  emerald: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  sky: "bg-sky-500/15 text-sky-700 dark:text-sky-300",
+};
+
 /**
  * Large, framed "screenshot" of the app for the landing hero — pure
  * markup in theme tokens, so it follows the colour scheme and light /
  * dark mode and never goes stale like a PNG would. Decorative only.
  */
-export function ProductPreview({ className }: { className?: string }) {
+export function ProductPreview({ className, sample = DEFAULT_SAMPLE }: { className?: string; sample?: PreviewSample }) {
   const nav = [
     { icon: LayoutDashboard, label: "Dashboard" },
     { icon: MessageSquare, label: "Inbox", active: true },
@@ -28,13 +76,8 @@ export function ProductPreview({ className }: { className?: string }) {
     { icon: Bot, label: "AI Agents" },
     { icon: GitBranch, label: "Pipelines" },
   ];
-  const chats = [
-    { name: "Priya Sharma", text: "Do you deliver to Pune by Friday?", time: "11m", unread: 2, active: true },
-    { name: "Aditya Verma", text: "We need GST invoices for B2B", time: "6m", unread: 3 },
-    { name: "Vikram Singh", text: "My order #4821 still shows…", time: "30m", unread: 1 },
-    { name: "Ananya Iyer", text: "Perfect, waiting for the quote", time: "1d" },
-    { name: "Arjun Nair", text: "Please send the invoice to accounts", time: "1d" },
-  ];
+  const { chats, messages, suggestion, contact } = sample;
+  const SuggestionIcon = suggestion.kind === "ai" ? Bot : Workflow;
 
   return (
     <div aria-hidden className={cn("min-w-0 rounded-xl border border-border bg-card p-1.5 shadow-[0_24px_60px_-24px_oklch(0.2_0.02_260/0.25)]", className)}>
@@ -87,38 +130,47 @@ export function ProductPreview({ className }: { className?: string }) {
         {/* Conversation */}
         <div className="flex min-h-[300px] min-w-0 flex-col gap-2 bg-muted/30 p-4 text-[12px]">
           <div className="mx-auto rounded-full bg-background px-2.5 py-0.5 text-[10px] text-muted-foreground">Today</div>
-          <p className="max-w-[80%] rounded-xl rounded-tl-sm bg-background px-3 py-2 shadow-sm">
-            Hi! Is the blue silk saree back in stock?
-          </p>
-          <p className="ml-auto max-w-[80%] rounded-xl rounded-tr-sm bg-primary px-3 py-2 text-primary-foreground">
-            Yes, it arrived this morning. Shall I reserve one for you?
-          </p>
-          <p className="max-w-[80%] rounded-xl rounded-tl-sm bg-background px-3 py-2 shadow-sm">
-            Yes please! Do you deliver to Pune by Friday?
-          </p>
+          {messages.map((m) =>
+            m.from === "customer" ? (
+              <p key={m.text} className="max-w-[80%] rounded-xl rounded-tl-sm bg-background px-3 py-2 shadow-sm">
+                {m.text}
+              </p>
+            ) : (
+              <p key={m.text} className="ml-auto max-w-[80%] rounded-xl rounded-tr-sm bg-primary px-3 py-2 text-primary-foreground">
+                {m.text}
+              </p>
+            ),
+          )}
           <div className="mt-auto flex items-center gap-2 rounded-xl border border-primary/30 bg-background px-3 py-2 text-primary">
-            <Bot className="size-3.5 shrink-0" />
-            <span className="min-w-0 truncate">AI draft: “Yes — order by Wednesday for Friday delivery.”</span>
+            <SuggestionIcon className="size-3.5 shrink-0" />
+            <span className="min-w-0 truncate">
+              {suggestion.label}: {suggestion.text}
+            </span>
             <span className="ml-auto shrink-0 rounded-md bg-primary px-2 py-0.5 text-[10px] font-medium text-primary-foreground">Use</span>
           </div>
         </div>
         {/* Contact panel */}
         <div className="hidden flex-col gap-3 border-l border-border p-4 text-[11px] lg:flex">
           <div className="flex flex-col items-center text-center">
-            <span className="flex size-10 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary">P</span>
-            <p className="mt-2 font-medium">Priya Sharma</p>
-            <p className="text-[10px] text-muted-foreground">Sharma Boutique</p>
+            <span className="flex size-10 items-center justify-center rounded-full bg-primary/15 text-sm font-semibold text-primary">
+              {contact.name[0]}
+            </span>
+            <p className="mt-2 font-medium">{contact.name}</p>
+            <p className="text-[10px] text-muted-foreground">{contact.subtitle}</p>
           </div>
           <div className="flex flex-wrap gap-1">
-            <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[9px] text-amber-700 dark:text-amber-300">VIP</span>
-            <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] text-emerald-700 dark:text-emerald-300">Repeat buyer</span>
+            {contact.tags.map((t) => (
+              <span key={t.label} className={cn("rounded-full px-2 py-0.5 text-[9px]", TONES[t.tone])}>
+                {t.label}
+              </span>
+            ))}
           </div>
           <div className="rounded-lg border border-border bg-card p-2.5">
-            <p className="text-[10px] text-muted-foreground">Deal</p>
-            <p className="font-medium">Wedding trousseau</p>
-            <p className="mt-1 flex justify-between text-[10px]">
-              <span>₹48,500</span>
-              <span className="text-primary">Negotiation</span>
+            <p className="text-[10px] text-muted-foreground">{contact.card.label}</p>
+            <p className="font-medium">{contact.card.title}</p>
+            <p className="mt-1 flex justify-between gap-2 text-[10px]">
+              <span className="tabular-nums">{contact.card.value}</span>
+              <span className="text-primary">{contact.card.stage}</span>
             </p>
           </div>
         </div>
