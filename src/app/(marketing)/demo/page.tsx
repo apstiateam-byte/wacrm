@@ -5,11 +5,14 @@ import { buttonVariants } from "@/components/ui/button";
 import { brand } from "@/content/marketing";
 import { demoEnabled } from "@/lib/demo/server";
 import { DemoButton } from "@/components/marketing/demo-button";
+import { pageMetadata } from "@/lib/marketing/seo";
 
-export const metadata: Metadata = {
-  title: "Live demo",
-  description: "Explore a live WhatsApp CRM workspace with sample data, or book a guided demo.",
-};
+export const metadata: Metadata = pageMetadata({
+  path: "/demo",
+  title: "Live demo — try the WhatsApp CRM",
+  description:
+    "Open a live WhatsApp CRM workspace with sample data: shared inbox, broadcasts, chatbot flows and sales pipeline. No sign-up needed, or book a guided demo.",
+});
 
 export default function DemoPage() {
   const live = demoEnabled();

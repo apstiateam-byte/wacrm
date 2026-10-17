@@ -3,11 +3,14 @@ import { CalendarDays, Mail, MapPin, Phone } from "lucide-react";
 
 import { brand } from "@/content/marketing";
 import { ContactForm } from "@/components/marketing/contact-form";
+import { pageMetadata } from "@/lib/marketing/seo";
 
-export const metadata: Metadata = {
-  title: "Contact us",
-  description: "Talk to sales or get support.",
-};
+export const metadata: Metadata = pageMetadata({
+  path: "/contact",
+  title: "Contact sales and support",
+  description:
+    "Talk to us about WhatsApp CRM plans, onboarding, in-person setup in Jaipur or support for your account. We reply within one business day.",
+});
 
 export default function ContactPage() {
   const items = [

@@ -5,17 +5,19 @@ import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { announcement, brand } from "@/content/marketing";
 import { niches } from "@/content/niches";
+import { SITE_URL } from "@/lib/marketing/seo";
 import { LogoMark } from "@/components/brand/logo";
 
 // The public site is meant to be found — override the app-wide noindex.
+// Pages set their own canonical URL and Open Graph tags via
+// pageMetadata() in src/lib/marketing/seo.ts.
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   // `absolute` so the root layout's "%s — wacrm" template doesn't append the brand twice.
   title: {
-    absolute: `${brand.name} — WhatsApp CRM for growing businesses`,
+    absolute: `${brand.name} — WhatsApp CRM for Indian businesses`,
     template: `%s — ${brand.name}`,
   },
-  description:
-    "Shared WhatsApp inbox, broadcast campaigns, chatbot flows, AI replies and a sales pipeline. 14-day free trial.",
   robots: { index: true, follow: true },
 };
 

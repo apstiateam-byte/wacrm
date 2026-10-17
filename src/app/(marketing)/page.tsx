@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
@@ -38,6 +39,18 @@ import { demoEnabled } from "@/lib/demo/server";
 import { PricingTable } from "@/components/marketing/pricing-table";
 import { ctaLg, FaqList, gridTexture, PricingFallback, SectionHead, Spotlight } from "@/components/marketing/sections";
 import { gstAnswer, loadPlans } from "@/lib/marketing/plans";
+import { pageMetadata } from "@/lib/marketing/seo";
+import { HomeJsonLd } from "@/components/marketing/json-ld";
+
+const HOME_DESCRIPTION =
+  "Shared WhatsApp inbox, broadcasts, chatbot flows, AI replies and a sales pipeline on the official WhatsApp Business API. Plans from ₹1,999/month with GST invoices. 14-day free trial.";
+
+export const metadata: Metadata = pageMetadata({
+  path: "/",
+  absoluteTitle: true,
+  title: `${brand.name} — WhatsApp CRM for Indian businesses`,
+  description: HOME_DESCRIPTION,
+});
 
 const ICONS: Record<(typeof features)[number]["icon"], LucideIcon> = {
   inbox: MessageSquare,
@@ -61,6 +74,7 @@ export default async function LandingPage() {
 
   return (
     <>
+      <HomeJsonLd plans={plans} faqs={faqItems} description={HOME_DESCRIPTION} />
       {/* ================= Hero ================= */}
       <section className="relative overflow-hidden border-b border-border">
         <div aria-hidden className={cn(gridTexture, "opacity-60 [mask-image:radial-gradient(ellipse_70%_60%_at_30%_0%,black,transparent)]")} />

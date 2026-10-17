@@ -9,6 +9,7 @@ import { PricingTable } from "@/components/marketing/pricing-table";
 import { ProductPreview } from "@/components/marketing/product-preview";
 import { ctaLg, FaqList, gridTexture, PricingFallback, SectionHead, Spotlight } from "@/components/marketing/sections";
 import { gstAnswer, loadPlans } from "@/lib/marketing/plans";
+import { breadcrumbLd, faqLd, JsonLd, organizationLd, softwareLd } from "@/components/marketing/json-ld";
 
 /**
  * Landing page for one niche (coaching, real estate…). Server component;
@@ -20,6 +21,17 @@ export async function NichePage({ content }: { content: NicheContent }) {
 
   return (
     <>
+      <JsonLd
+        graph={[
+          organizationLd(),
+          softwareLd(plans, content.meta.description),
+          faqLd(faqItems),
+          breadcrumbLd([
+            { name: "Home", path: "/" },
+            { name: content.navLabel, path: `/${content.slug}` },
+          ]),
+        ]}
+      />
       {/* ================= Hero ================= */}
       <section className="relative overflow-hidden border-b border-border">
         <div aria-hidden className={cn(gridTexture, "opacity-60 [mask-image:radial-gradient(ellipse_70%_60%_at_30%_0%,black,transparent)]")} />

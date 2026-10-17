@@ -5,11 +5,17 @@ import { brand, faqs } from "@/content/marketing";
 import { taxSettingsOf, type Addon, type Plan } from "@/lib/billing/types";
 import { supabaseAdmin } from "@/lib/flows/admin-client";
 import { PricingTable } from "@/components/marketing/pricing-table";
+import { pageMetadata } from "@/lib/marketing/seo";
+import { breadcrumbLd, JsonLd, softwareLd } from "@/components/marketing/json-ld";
 
-export const metadata: Metadata = {
-  title: "Pricing",
-  description: "Simple monthly or annual plans for WhatsApp CRM. 14-day free trial, no card required.",
-};
+const PRICING_DESCRIPTION =
+  "WhatsApp CRM plans from ₹1,999/month, billed in INR with GST invoices and 20% off annual billing. No markup on Meta message charges. 14-day free trial, no card required.";
+
+export const metadata: Metadata = pageMetadata({
+  path: "/pricing",
+  title: "Pricing — WhatsApp CRM plans in INR",
+  description: PRICING_DESCRIPTION,
+});
 
 // Plans are edited in /admin — always render the live catalogue.
 export const dynamic = "force-dynamic";
@@ -31,6 +37,15 @@ export default async function PricingPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
+      <JsonLd
+        graph={[
+          softwareLd((plans ?? []) as Plan[], PRICING_DESCRIPTION),
+          breadcrumbLd([
+            { name: "Home", path: "/" },
+            { name: "Pricing", path: "/pricing" },
+          ]),
+        ]}
+      />
       <div className="mx-auto max-w-2xl text-center">
         <h1 className="font-display text-4xl sm:text-5xl">Plans for every stage of growth</h1>
         <p className="mt-4 text-lg text-muted-foreground">
